@@ -1,0 +1,6 @@
+socket
+scapy
+ipaddress
+threading
+argparse
+prettyTable

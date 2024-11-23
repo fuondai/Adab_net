@@ -1,0 +1,17 @@
+network_scanner/          # Thư mục gốc của dự án
+├── scanner/              # Thư mục chứa mã nguồn chính
+│   ├── __init__.py       # Định nghĩa thư mục này là một module Python
+│   ├── core.py           # Chứa các hàm và lớp chính (ping scan, port scan)
+│   ├── utils.py          # Các hàm tiện ích (hàm xử lý IP, hiển thị kết quả)
+│   ├── cli.py            # Xử lý đầu vào dòng lệnh bằng argparse
+│   ├── reports.py        # Tạo báo cáo kết quả (dạng bảng hoặc file)
+│   ├── config.py         # Các cấu hình mặc định (như dải cổng, timeout)
+├── tests/                # Thư mục kiểm thử
+│   ├── test_core.py      # Kiểm tra các chức năng chính
+│   ├── test_utils.py     # Kiểm tra các hàm tiện ích
+├── examples/             # Ví dụ sử dụng ứng dụng
+│   ├── example_usage.py  # Hướng dẫn cách sử dụng
+├── requirements.txt      # Danh sách các thư viện cần thiết
+├── README.md             # Tài liệu hướng dẫn sử dụng
+├── LICENSE               # Thông tin về giấy phép (nếu cần)
+└── main.py               # Tập tin chính để chạy ứng dụng
