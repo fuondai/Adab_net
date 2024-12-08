@@ -75,7 +75,6 @@ class SpecializedScanner:
         except Exception:
             return None
 
-    # Rest of the methods remain the same as in the previous implementation
     def _syn_stealth_port(self, target, port):
         """
         Check a single port with SYN stealth method
@@ -146,7 +145,8 @@ class SpecializedScanner:
                 result = future.result()
                 if result:
                     results.append(result)
-        return sorted(results)
+        # Sort results by port number
+        return sorted(results, key=lambda x: int(x.split(':')[1]))
 
     def tcp_connect_scan(self):
         """
@@ -163,7 +163,8 @@ class SpecializedScanner:
                 result = future.result()
                 if result:
                     results.append(result)
-        return sorted(results)
+        # Sort results by port number
+        return sorted(results, key=lambda x: int(x.split(':')[1]))
 
     def udp_scan(self):
         """
@@ -180,7 +181,8 @@ class SpecializedScanner:
                 result = future.result()
                 if result:
                     results.append(result)
-        return sorted(results)
+        # Sort results by port number
+        return sorted(results, key=lambda x: int(x.split(':')[1]))
 
     def scan(self):
         """
