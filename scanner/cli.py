@@ -111,7 +111,14 @@ def parse_args():
                         help="Path to custom credentials file")
     parser.add_argument("--nvd-key", type=str, 
                         help="NVD API Key for CVE scanning")
-                        
+    # Enterprise mode
+    parser.add_argument("--enterprise", action="store_true",
+                    help="Enterprise edition (API key needed).")
+    
+    # MAC find
+    parser.add_argument("--get-mac", type=str, metavar="IP",
+                        help="Get the MAC address of the specified IP address.")
+    
     args = parser.parse_args()
     
     # Post-processing port input

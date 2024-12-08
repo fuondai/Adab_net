@@ -1,5 +1,12 @@
 import time
+import os
+import requests
 
+LICENSE_FILE = "license.key" 
+SECRET_KEY_FILE = "secret.key"
+
+from cryptography.fernet import Fernet
+from colorama import init, Fore, Style
 from scanner.cli import parse_args
 from scanner.core import ServiceVersionScanner, PingChecker, ArpScanner
 from scanner.utils import parse_input, get_input_from_file
@@ -7,11 +14,90 @@ from scanner.dns_scanner import DnsScanner
 from scanner.specialized_scan import SpecializedScanner
 from scanner.auth_scanner import AuthScanner
 from scanner.cve_scanner import CVEScanner
+from scanner.mac_scanner import get_mac_address
 
+def load_secret_key():
+    """Load khóa bí mật từ file."""
+    if not os.path.exists(SECRET_KEY_FILE):
+        raise FileNotFoundError("Secret key file not found. Please generate it first.")
+    with open(SECRET_KEY_FILE, "rb") as key_file:
+        return key_file.read()
+
+def encrypt_api_key(api_key):
+    """Mã hóa API key và lưu vào file LICENSE_FILE."""
+    secret_key = load_secret_key()
+    cipher = Fernet(secret_key)
+    encrypted_key = cipher.encrypt(api_key.encode())
+    with open(LICENSE_FILE, "wb") as license_file:
+        license_file.write(encrypted_key)
+
+def decrypt_api_key():
+    """Giải mã API key từ file LICENSE_FILE."""
+    if not os.path.exists(LICENSE_FILE):
+        return None
+    secret_key = load_secret_key()
+    cipher = Fernet(secret_key)
+    with open(LICENSE_FILE, "rb") as license_file:
+        encrypted_key = license_file.read()
+    try:
+        return cipher.decrypt(encrypted_key).decode()
+    except Exception:
+        return None
+        
+def is_enterprise_activated():
+    """Kiểm tra xem bản quyền enterprise đã kích hoạt chưa."""
+    return os.path.exists(LICENSE_FILE)
+
+
+def save_license_key(api_key):
+    """Lưu API key vào tệp license.key."""
+    with open(LICENSE_FILE, "w") as f:
+        f.write(api_key)
+
+
+def get_saved_license_key():
+    """Đọc API key từ tệp license.key."""
+    if os.path.exists(LICENSE_FILE):
+        with open(LICENSE_FILE, "r") as f:
+            return f.read().strip()
+    return None
+
+
+def verify_license_key(api_key):
+    """Xác minh API key bằng cách gửi yêu cầu tới máy chủ."""
+    try:
+        response = requests.post("http://localhost:5000/verify", json={"api_key": api_key})
+        if response.status_code == 200 and response.json().get("status") == "valid":
+            return True
+    except requests.exceptions.RequestException:
+        pass
+    return False
+    
 def main():
+
+    # Kiểm tra xem enterprise đã kích hoạt chưa
+    saved_api_key = decrypt_api_key()
+    enterprise_activated = saved_api_key is not None
+    print_logo(is_enterprise=enterprise_activated)
+         
     # Parse command-line arguments
     args = parse_args()
-
+    
+    # Nếu người dùng chọn chế độ enterprise và chưa kích hoạt bản quyền
+    if args.enterprise and not enterprise_activated:
+        api_key = input("Enter API KEY: ").strip()
+        if not api_key or not verify_license_key(api_key):
+            print("Invalid API key. EXIT.")
+            return
+        encrypt_api_key(api_key)
+        print("Enterprise license activated successfully!")
+        enterprise_activated = True
+    
+    # MAC FIND
+    if args.get_mac:
+        get_mac_address(args.get_mac) 
+        return
+        
     # DNS Scan
     if args.dns:
         perform_dns_scan(args.dns)
@@ -32,6 +118,34 @@ def main():
     # Authentication and vulnerability scanning
     perform_security_scans(targets, args)
 
+def print_logo(is_enterprise=False):
+    init(autoreset=True)
+    if is_enterprise:
+        logo = fr"""
+{Fore.YELLOW}{Style.BRIGHT}
+    ___       __      __               __ 
+   /   | ____/ /___ _/ /_  ____  ___  / /_
+  / /| |/ __  / __ `/ __ \/ __ \/ _ \/ __/
+ / ___ / /_/ / /_/ / /_/ / / / /  __/ /_  
+/_/  |_\__,_/\__,_/_.___/_/ /_/\___/\__/  
+   _   _   _   _   _   _   _   _   _   _  
+  / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ 
+ ( e | n | t | e | r | p | r | i | s | e )
+  \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/                                               
+{Style.RESET_ALL}
+        """
+    else:
+        logo = fr"""
+{Fore.CYAN}{Style.BRIGHT}
+    ___       __      __               __ 
+   /   | ____/ /___ _/ /_  ____  ___  / /_
+  / /| |/ __  / __ `/ __ \/ __ \/ _ \/ __/
+ / ___ / /_/ / /_/ / /_/ / / / /  __/ /_  
+/_/  |_\__,_/\__,_/_.___/_/ /_/\___/\__/                                            
+{Style.RESET_ALL}
+        """
+    print(logo)
+    
 def perform_dns_scan(domains):
     """Perform DNS scanning on specified domains."""
     dns_scanner = DnsScanner(domains)
