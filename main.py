@@ -15,6 +15,7 @@ from scanner.specialized_scan import SpecializedScanner
 from scanner.auth_scanner import AuthScanner
 from scanner.cve_scanner import CVEScanner
 from scanner.mac_scanner import get_mac_address
+from scanner.thank_you import welcome
 
 def load_secret_key():
     """Load khóa bí mật từ file."""
@@ -68,6 +69,7 @@ def verify_license_key(api_key):
     try:
         response = requests.post("http://localhost:5000/verify", json={"api_key": api_key})
         if response.status_code == 200 and response.json().get("status") == "valid":
+            welcome()	
             return True
     except requests.exceptions.RequestException:
         pass
@@ -92,6 +94,7 @@ def main():
         encrypt_api_key(api_key)
         print("Enterprise license activated successfully!")
         enterprise_activated = True
+        exit()
     
     # MAC FIND
     if args.get_mac:
