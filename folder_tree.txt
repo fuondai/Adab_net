@@ -4,6 +4,10 @@ network_scanner/          # Thư mục gốc của dự án
 │   ├── core.py           # Chứa các hàm và lớp chính (ping scan, port scan)
 │   ├── utils.py          # Các hàm tiện ích (hàm xử lý IP, hiển thị kết quả)
 │   ├── cli.py            # Xử lý đầu vào dòng lệnh bằng argparse
+│   ├── auth_scanner.py   # New module for authentication scanning
+│   ├── cve_scanner.py    # New module for CVE scanning
+│   ├── dns_scanner.py    # New module for DNS scanning
+│   ├── specialized_scan.py # New module for specialized scanning
 │   ├── reports.py        # Tạo báo cáo kết quả (dạng bảng hoặc file)
 │   ├── config.py         # Các cấu hình mặc định (như dải cổng, timeout)
 ├── tests/                # Thư mục kiểm thử
