@@ -11,32 +11,6 @@ Device Scanning: Find devices connected to your network.
 Wireshark Integration: Monitor network packets in real-time with Wireshark.
 Directory Busting: Use dirbuster to find hidden directories on websites.
 API Key Management: Manage and encrypt your API key for enterprise features.
-Project Structure
-Here is the project structure of Adabnet:
-NetworkScanner/
-├── scanner/                          # 🛠️ Powerful scanning tools!
-│   ├── __init__.py                   # 👷‍♂️ The starting point of the scanning journey!
-│   ├── cli.py                        # 📡 Cute command-line arguments to run the tool
-│   ├── core.py                       # 🧠 The brain of the project, contains core services like service scanning, ping, ARP
-│   ├── dns_scanner.py                # 🌐 Expert in DNS scanning, finding every DNS record!
-│   ├── specialized_scan.py           # 🔍 Specialized scans for adventurous types
-│   ├── auth_scanner.py               # 🔐 Security scanning for authentication vulnerabilities
-│   ├── mac_scanner.py                # 🖥️ Scan MAC addresses, know who's on your network
-│   ├── thank_you.py                  # ❤️ Thank you for using this awesome tool!
-│   ├── dirbuster.py                  # 🚪 Directory busting, find hidden paths in websites
-│   ├── device_scanner.py             # 📱 Scan devices connected to your network
-│   ├── subdomain_scanner.py          # 🏰 Scan subdomains of a domain, discover new territories
-│   ├── vuln_scanner.py               # 🔥 Scan for vulnerabilities, don’t let them escape!
-│   ├── whois_scanner.py              # 🕵️‍♂️ Whois information lookup
-│   ├── traceroute_scanner.py         # 🌍 Trace the path of packets, from you to the world!
-│   ├── wireshark_scanner.py          # 🐳 Monitor network traffic with Wireshark, explore every packet!
-│   ├── license_manager.py            # 🛡️ API key management and encryption tools
-│   └── utils.py                      # ⚙️ Utility functions to make everything easier
-├── main.py                           # 🚀 The entry point of the scanning journey, let’s start!
-├── requirements.txt                  # 📜 The necessary libraries to make everything work
-├── license.key                       # 🔑 The secret API key file (don’t lose it!)
-├── secret.key                        # 🔒 The secret key used for encryption/decryption
-└── README.md                         # 📚 Documentation to guide you through everything (don’t skip it!)
 
 Installation and System Requirements
 System Requirements:
