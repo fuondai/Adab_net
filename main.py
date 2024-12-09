@@ -13,9 +13,15 @@ from scanner.utils import parse_input, get_input_from_file
 from scanner.dns_scanner import DnsScanner
 from scanner.specialized_scan import SpecializedScanner
 from scanner.auth_scanner import AuthScanner
-from scanner.cve_scanner import CVEScanner
 from scanner.mac_scanner import get_mac_address
 from scanner.thank_you import welcome
+from scanner.dirbuster import dirbust
+from scanner.device_scanner import scan_local_devices, print_device_list
+from scanner.subdomain_scanner import sdenum
+from scanner.vuln_scanner import vulnscan
+from scanner.whois_scanner import whoisinfo
+from scanner.traceroute_scanner import tracert
+from scanner.wireshark_scanner import start_packet_capture
 
 def load_secret_key():
     """Load khóa bí mật từ file."""
@@ -85,6 +91,17 @@ def main():
     # Parse command-line arguments
     args = parse_args()
     
+    # Quét subdomain nếu người dùng sử dụng tùy chọn --scan-subdomains
+    if args.scan_subdomains:
+        domain = args.scan_subdomains
+        if not args.wordlist:
+            print(f"[{Fore.RED}!{Style.RESET_ALL}] Error: You must provide a wordlist with --wordlist.")
+            return
+
+        wordlist = args.wordlist  # Đọc đường dẫn wordlist từ dòng lệnh
+        sdenum(domain, wordlist)  # Gọi module quét subdomain
+        return
+        
     # Nếu người dùng chọn chế độ enterprise và chưa kích hoạt bản quyền
     if args.enterprise and not enterprise_activated:
         api_key = input("Enter API KEY: ").strip()
@@ -96,6 +113,32 @@ def main():
         enterprise_activated = True
         exit()
     
+    # Device Scan
+    if args.scan_devices:
+        network = args.scan_devices
+        devices = scan_local_devices(network)
+        print_device_list(devices)
+        return
+    
+    #WhoIS
+    if args.whois:
+        host = args.whois
+        whoisinfo(host)  # Gọi module WHOIS để lấy thông tin
+        return
+    
+    # Traceroute
+    if args.traceroute:
+        host = args.traceroute
+        tracert(host)  # Gọi module traceroute
+        return
+        
+    # Vuln Scan
+    if args.vuln_scan:
+        host = args.vuln_scan
+        api_key = "your_shodan_api_key_here"  
+        vulnscan(host, api_key)
+        return
+            
     # MAC FIND
     if args.get_mac:
         get_mac_address(args.get_mac) 
@@ -105,7 +148,18 @@ def main():
     if args.dns:
         perform_dns_scan(args.dns)
         return
-
+    
+    # Wireshark
+    if args.wireshark:
+        interface = args.wireshark
+        start_packet_capture(interface)  
+        
+    # Firectory Busting
+    if args.dirbust:
+        host, wordlist = args.dirbust
+        dirbust(host, wordlist)
+        return
+    	
     # Validate and process targets
     targets = process_targets(args)
     if not targets:
@@ -230,15 +284,11 @@ def perform_specialized_scans(targets, args):
                 print(result)
 
 def perform_security_scans(targets, args):
-    """Perform authentication and CVE scanning."""
+    """Perform authentication scanning."""
     if args.auth:
         auth_scanner = AuthScanner(targets, credentials_file=args.creds)
         auth_results = auth_scanner.scan()
         print_auth_results(auth_results)
-
-    if args.cve:
-        cve_results = perform_cve_scan(targets, args)
-        print_cve_results(cve_results)
 
     # Ping and ARP scans
     if args.ping_check:
@@ -256,29 +306,6 @@ def print_auth_results(auth_results):
             print(f"  {service.upper()} Vulnerable Credentials:")
             for username, password in creds:
                 print(f"    {username}:{password}")
-
-def perform_cve_scan(targets, args):
-    """Perform comprehensive CVE scanning."""
-    service_scan_results = {}
-    for target in targets:
-        scanner = ServiceVersionScanner(target, args.ports)
-        results = scanner.scan()
-        for port, state, service, version in results:
-            if state == "OPEN":
-                service_scan_results[service] = version
-    
-    cve_scanner = CVEScanner(nvd_api_key=args.nvd_key)
-    return cve_scanner.scan(service_scan_results)
-
-def print_cve_results(cve_results):
-    """Print CVE scanning results."""
-    print("\nCVE Scanning Results:")
-    for service, cves in cve_results.items():
-        print(f"{service}:")
-        for cve in cves:
-            print(f"  CVE: {cve['id']}")
-            print(f"  Severity: {cve['severity']}")
-            print(f"  Description: {cve['description']}\n")
 
 def perform_ping_check(targets):
     """Perform ping check on targets."""

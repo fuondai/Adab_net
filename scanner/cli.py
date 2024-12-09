@@ -105,12 +105,8 @@ def parse_args():
     # Security scanning
     parser.add_argument("--auth", action="store_true", 
                         help="Perform authentication scanning")
-    parser.add_argument("--cve", action="store_true", 
-                        help="Scan for known CVEs")
     parser.add_argument("--creds", type=str, 
                         help="Path to custom credentials file")
-    parser.add_argument("--nvd-key", type=str, 
-                        help="NVD API Key for CVE scanning")
     # Enterprise mode
     parser.add_argument("--enterprise", action="store_true",
                     help="Enterprise edition (API key needed).")
@@ -118,6 +114,36 @@ def parse_args():
     # MAC find
     parser.add_argument("--get-mac", type=str, metavar="IP",
                         help="Get the MAC address of the specified IP address.")
+    
+    # Local Device Scan
+    parser.add_argument("--scan-devices", type=str, metavar="NETWORK",
+                        help="Scan the network for connected devices (e.g., 192.168.1.0/24).")
+    
+    #Subdomain Scan
+    parser.add_argument("--scan-subdomains", type=str, metavar="DOMAIN",
+                        help="Perform subdomain enumeration on the specified domain (e.g., example.com).")
+    parser.add_argument("--wordlist", type=str, metavar="WORDLIST",
+                        help="Path to the wordlist file for subdomain enumeration.")
+    
+    #Vuln Scan                    
+    parser.add_argument("--vuln-scan", type=str, metavar="HOST",
+                        help="Perform vulnerability scan on the specified host using Shodan.")
+    
+    #WhoIS
+    parser.add_argument("--whois", type=str, metavar="DOMAIN", 
+    			help="Perform WHOIS lookup on the specified domain.")
+    
+    # Traceroute
+    parser.add_argument("--traceroute", type=str, metavar="HOST", 
+    			help="Perform traceroute on the specified host.")
+    
+    # Directory Busting
+    parser.add_argument("--dirbust", nargs=2, metavar=("HOST", "WORDLIST"),
+                        help="Perform directory busting on the specified host using the given wordlist.")
+    
+    #Wireshark capture
+    parser.add_argument("--wireshark", type=str, metavar="INTERFACE", 
+    			help="Capture packets on the specified network interface.")
     
     args = parser.parse_args()
     

@@ -1,21 +1,44 @@
-network_scanner/          # Thư mục gốc của dự án
-├── scanner/              # Thư mục chứa mã nguồn chính
-│   ├── __init__.py       # Định nghĩa thư mục này là một module Python
-│   ├── core.py           # Chứa các hàm và lớp chính (ping scan, port scan)
-│   ├── utils.py          # Các hàm tiện ích (hàm xử lý IP, hiển thị kết quả)
-│   ├── cli.py            # Xử lý đầu vào dòng lệnh bằng argparse
-│   ├── auth_scanner.py   # New module for authentication scanning
-│   ├── cve_scanner.py    # New module for CVE scanning
-│   ├── dns_scanner.py    # New module for DNS scanning
-│   ├── specialized_scan.py # New module for specialized scanning
-│   ├── reports.py        # Tạo báo cáo kết quả (dạng bảng hoặc file)
-│   ├── config.py         # Các cấu hình mặc định (như dải cổng, timeout)
-├── tests/                # Thư mục kiểm thử
-│   ├── test_core.py      # Kiểm tra các chức năng chính
-│   ├── test_utils.py     # Kiểm tra các hàm tiện ích
-├── examples/             # Ví dụ sử dụng ứng dụng
-│   ├── example_usage.py  # Hướng dẫn cách sử dụng
-├── requirements.txt      # Danh sách các thư viện cần thiết
-├── README.md             # Tài liệu hướng dẫn sử dụng
-├── LICENSE               # Thông tin về giấy phép (nếu cần)
-└── main.py               # Tập tin chính để chạy ứng dụng
+    ___       __      __               __     _____                           
+   /   | ____/ /___ _/ /_  ____  ___  / /_   / ___/_________ _____  ___  _____
+  / /| |/ __  / __ `/ __ \/ __ \/ _ \/ __/   \__ \/ ___/ __ `/ __ \/ _ \/ ___/
+ / ___ / /_/ / /_/ / /_/ / / / /  __/ /_    ___/ / /__/ /_/ / / / /  __/ /    
+/_/  |_\__,_/\__,_/_.___/_/ /_/\___/\__/   /____/\___/\__,_/_/ /_/\___/_/   
+                                                                            
+NetworkScanner/
+├── scanner/			  # 🛠️ Các công cụ quét siêu mạnh mẽ!
+│   ├── __init__.py               # 👷‍♂️ File khởi tạo module (rỗng), mở đầu cho cuộc hành trình quét!
+│   ├── cli.py                    # 📡 Các lệnh siêu dễ thương để bạn chạy trên dòng lệnh (command-line arguments)
+│   ├── core.py                   # 🧠 Bộ não của dự án, chứa các chức năng chính như quét dịch vụ, ping, ARP
+│   ├── dns_scanner.py            # 🌐 Quét DNS như một chuyên gia, đi tìm mọi bản ghi DNS!
+│   ├── specialized_scan.py       # 🔍 Các quét chuyên sâu cho những kẻ thích mạo hiểm
+│   ├── auth_scanner.py           # 🔐 Quét bảo mật để kiểm tra mọi lỗ hổng bảo mật
+│   ├── mac_scanner.py            # 🖥️ Quét địa chỉ MAC, biết ai đang chơi cùng mạng với bạn
+│   ├── thank_you.py              # ❤️ Cảm ơn vì đã sử dụng công cụ tuyệt vời này! 
+│   ├── dirbuster.py              # 🚪 Quét thư mục, tìm mọi ngóc ngách của website
+│   ├── device_scanner.py         # 📱 Quét các thiết bị kết nối trong mạng, có thể tìm thấy thiết bị ẩn!
+│   ├── subdomain_scanner.py      # 🏰 Quét các subdomain của domain, khám phá những vùng đất mới
+│   ├── vuln_scanner.py           # 🔥 Quét lỗ hổng bảo mật với Shodan, đừng để chúng trốn thoát!
+│   ├── whois_scanner.py          # 🕵️‍♂️ Tìm kiếm thông tin WHOIS của các domain
+│   ├── traceroute_scanner.py     # 🌍 Truy vết đường đi của gói tin, từ bạn đến thế giới!
+│   ├── wireshark_scanner.py      # 🐳 Quét mạng với Wireshark, khám phá mọi gói tin!
+│   ├── license_manager.py        # 🛡️ Quản lý bản quyền API, giúp bạn giữ an toàn với API keys
+│   └── utils.py                  # ⚙️ Các hàm tiện ích hỗ trợ, giúp công việc trở nên dễ dàng hơn
+│
+├── server/
+│   ├── create_secret_key.py      # 🔑 Khởi tạo sercet.key
+│   └── server.py                 # 🔒 Server xác nhận key
+│
+├── wordlists/			  # 📚 Thư mục Wordlists
+│   ├── directory-list-1.0.txt    
+│   ├── directory-list-2.3-small.txt                 
+│   └── directory-list-2.3-medium.txt
+│
+├── tests/			  
+│   └─ test_core.py    		  # ⚙️ Kiểm tra công cụ
+│ 
+├── folder_tree.txt               # Cấu trúc thư mục của dự án (Bạn đang ở đây 📍)
+├── main.py                       # 🚀 Điểm bắt đầu của hành trình quét mạng, hãy khởi động!
+├── requirements.txt              # 📜 Các thứ bạn cần cài đặt để làm cho mọi thứ hoạt động
+├── license.key                   # 🔑 Bí mật API key của bạn (đừng làm mất nhé!)
+├── secret.key                    # 🔒 Khóa bảo mật dùng để mã hóa API key
+└── README.md                     # 📚 Tài liệu hướng dẫn bạn cách làm mọi thứ (đừng bỏ qua nhé!)
