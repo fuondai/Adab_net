@@ -1,146 +1,74 @@
 ﻿# NT140.P11-NetworkScanner
 
-Adabnet là một công cụ quét mạng mạnh mẽ, cho phép bạn kiểm tra, quét các thiết bị, dịch vụ, subdomains, lỗ hổng bảo mật và nhiều tính năng khác trong một mạng. Công cụ này sử dụng nhiều phương pháp quét và phân tích khác nhau, bao gồm quét DNS, quét MAC, quét subdomain, quét lỗ hổng bảo mật và giám sát mạng với Wireshark.
+Adabnet is a powerful network scanning tool that allows you to check, scan devices, services, subdomains, vulnerabilities, and much more on a network. This tool uses various scanning and analysis methods, including DNS scanning, MAC scanning, subdomain scanning, vulnerability scanning, and real-time network monitoring with Wireshark.
 
-Tính năng chính
-Quét Subdomain: Tìm kiếm tất cả các subdomains của một domain.
-Quét DNS: Kiểm tra các bản ghi DNS của một domain.
-Quét Lỗ Hổng Bảo Mật: Quét các lỗ hổng bảo mật sử dụng Shodan API.
-Truy Vết Đường Đi Gói Tin (Traceroute): Xác định đường đi của gói tin qua mạng.
-Quét Các Thiết Bị Kết Nối: Tìm các thiết bị kết nối vào mạng của bạn.
-Giám Sát Mạng Với Wireshark: Giám sát gói tin mạng theo thời gian thực.
-Quét Thư Mục Website: Dùng dirbuster để tìm các thư mục ẩn trên website.
-Quản Lý Bản Quyền API: Hệ thống quản lý và mã hóa API key để kích hoạt tính năng enterprise.
-
-Cấu Trúc Thư Mục
-Dưới đây là cấu trúc thư mục của dự án:
-**\_ ** \_\_ ** \_\_\_**  
- / | \_**_/ /_** _/ /_ \_**\_ \_** / /\_ / **\_/**\_\_\_**** **\_** **\_ \_\_\_**
-/ /| |/ ** / ** `/ __ \/ __ \/ _ \/ __/   \__ \/ ___/ __ `/ ** \/ _ \/ _**/
-/ **_ / /_/ / /_/ / /_/ / / / / **/ /\_ **\_/ / /**/ /_/ / / / / \_\_/ /  
-/_/ |\_\__,_/\__,_/\_.**_/_/ /\_/\_**/\_\_/ /\_**\_/\_**/\__,_/_/ /_/\_\__/_/
-
+Key Features
+Subdomain Scanning: Discover all subdomains of a given domain.
+DNS Scanning: Check the DNS records of a domain.
+Vulnerability Scanning: Scan for vulnerabilities using the Shodan API.
+Traceroute: Trace the path of packets across the network.
+Device Scanning: Find devices connected to your network.
+Wireshark Integration: Monitor network packets in real-time with Wireshark.
+Directory Busting: Use dirbuster to find hidden directories on websites.
+API Key Management: Manage and encrypt your API key for enterprise features.
+Project Structure
+Here is the project structure of Adabnet:
 NetworkScanner/
-├── scanner/ # 🛠️ Các công cụ quét siêu mạnh mẽ!
-│ ├── **init**.py # 👷‍♂️ File khởi tạo module (rỗng), mở đầu cho cuộc hành trình quét!
-│ ├── cli.py # 📡 Các lệnh siêu dễ thương để bạn chạy trên dòng lệnh (command-line arguments)
-│ ├── core.py # 🧠 Bộ não của dự án, chứa các chức năng chính như quét dịch vụ, ping, ARP
-│ ├── dns_scanner.py # 🌐 Quét DNS như một chuyên gia, đi tìm mọi bản ghi DNS!
-│ ├── specialized_scan.py # 🔍 Các quét chuyên sâu cho những kẻ thích mạo hiểm
-│ ├── auth_scanner.py # 🔐 Quét bảo mật để kiểm tra mọi lỗ hổng bảo mật
-│ ├── mac_scanner.py # 🖥️ Quét địa chỉ MAC, biết ai đang chơi cùng mạng với bạn
-│ ├── thank_you.py # ❤️ Cảm ơn vì đã sử dụng công cụ tuyệt vời này!
-│ ├── dirbuster.py # 🚪 Quét thư mục, tìm mọi ngóc ngách của website
-│ ├── device_scanner.py # 📱 Quét các thiết bị kết nối trong mạng, có thể tìm thấy thiết bị ẩn!
-│ ├── subdomain_scanner.py # 🏰 Quét các subdomain của domain, khám phá những vùng đất mới
-│ ├── vuln_scanner.py # 🔥 Quét lỗ hổng bảo mật với Shodan, đừng để chúng trốn thoát!
-│ ├── whois_scanner.py # 🕵️‍♂️ Tìm kiếm thông tin WHOIS của các domain
-│ ├── traceroute_scanner.py # 🌍 Truy vết đường đi của gói tin, từ bạn đến thế giới!
-│ ├── wireshark_scanner.py # 🐳 Quét mạng với Wireshark, khám phá mọi gói tin!
-│ ├── license_manager.py # 🛡️ Quản lý bản quyền API, giúp bạn giữ an toàn với API keys
-│ └── utils.py # ⚙️ Các hàm tiện ích hỗ trợ, giúp công việc trở nên dễ dàng hơn
-│
-├── server/
-│ ├── create_secret_key.py # 🔑 Khởi tạo sercet.key
-│ └── server.py # 🔒 Server xác nhận key
-│
-├── wordlists/ # 📚 Thư mục Wordlists
-│ ├── directory-list-1.0.txt  
-│ ├── directory-list-2.3-small.txt  
-│ └── directory-list-2.3-medium.txt
-│
-├── tests/   
-│ └─ test_core.py # ⚙️ Kiểm tra công cụ
-│
-├── folder_tree.txt # Cấu trúc thư mục của dự án (Bạn đang ở đây 📍)
-├── main.py # 🚀 Điểm bắt đầu của hành trình quét mạng, hãy khởi động!
-├── requirements.txt # 📜 Các thứ bạn cần cài đặt để làm cho mọi thứ hoạt động
-├── license.key # 🔑 Bí mật API key của bạn (đừng làm mất nhé!)
-├── secret.key # 🔒 Khóa bảo mật dùng để mã hóa API key
-└── README.md # 📚 Tài liệu hướng dẫn bạn cách làm mọi thứ (đừng bỏ qua nhé!)
+├── scanner/                          # 🛠️ Powerful scanning tools!
+│   ├── __init__.py                   # 👷‍♂️ The starting point of the scanning journey!
+│   ├── cli.py                        # 📡 Cute command-line arguments to run the tool
+│   ├── core.py                       # 🧠 The brain of the project, contains core services like service scanning, ping, ARP
+│   ├── dns_scanner.py                # 🌐 Expert in DNS scanning, finding every DNS record!
+│   ├── specialized_scan.py           # 🔍 Specialized scans for adventurous types
+│   ├── auth_scanner.py               # 🔐 Security scanning for authentication vulnerabilities
+│   ├── mac_scanner.py                # 🖥️ Scan MAC addresses, know who's on your network
+│   ├── thank_you.py                  # ❤️ Thank you for using this awesome tool!
+│   ├── dirbuster.py                  # 🚪 Directory busting, find hidden paths in websites
+│   ├── device_scanner.py             # 📱 Scan devices connected to your network
+│   ├── subdomain_scanner.py          # 🏰 Scan subdomains of a domain, discover new territories
+│   ├── vuln_scanner.py               # 🔥 Scan for vulnerabilities, don’t let them escape!
+│   ├── whois_scanner.py              # 🕵️‍♂️ Whois information lookup
+│   ├── traceroute_scanner.py         # 🌍 Trace the path of packets, from you to the world!
+│   ├── wireshark_scanner.py          # 🐳 Monitor network traffic with Wireshark, explore every packet!
+│   ├── license_manager.py            # 🛡️ API key management and encryption tools
+│   └── utils.py                      # ⚙️ Utility functions to make everything easier
+├── main.py                           # 🚀 The entry point of the scanning journey, let’s start!
+├── requirements.txt                  # 📜 The necessary libraries to make everything work
+├── license.key                       # 🔑 The secret API key file (don’t lose it!)
+├── secret.key                        # 🔒 The secret key used for encryption/decryption
+└── README.md                         # 📚 Documentation to guide you through everything (don’t skip it!)
 
-Cài đặt và yêu cầu hệ thống
-Yêu cầu hệ thống:
+Installation and System Requirements
+System Requirements:
 Python 3.6+
-Thư viện yêu cầu:
-requests: Để gửi yêu cầu HTTP cho API và quét lỗ hổng.
-python-whois: Để lấy thông tin WHOIS.
-pyshark: Để giám sát mạng với Wireshark.
-colorama: Để tạo màu sắc đẹp cho giao diện người dùng trên terminal.
-shodan: Để quét lỗ hổng bảo mật qua Shodan.
-cryptography: Để mã hóa và giải mã API key.
-Cài đặt thư viện:
-Cài đặt các thư viện yêu cầu với lệnh:
-
-bash
-Copy code
+Required Libraries:
+requests: For sending HTTP requests for API and vulnerability scanning.
+python-whois: To retrieve WHOIS information.
+pyshark: For network traffic monitoring using Wireshark.
+colorama: For adding color to the terminal UI.
+shodan: For vulnerability scanning with the Shodan API.
+cryptography: For encrypting and decrypting the API key.
+Install Required Libraries:
+Install all the required libraries by running the following command:
 pip install -r requirements.txt
-Cài đặt Wireshark:
-Công cụ này yêu cầu Wireshark và Tshark phải được cài đặt. Bạn có thể cài đặt Wireshark bằng cách sử dụng apt (trên hệ điều hành Ubuntu/Debian):
 
-sudo apt-get install wireshark tshark
-Cài đặt Shodan API:
-Bạn cần một Shodan API key để sử dụng tính năng quét lỗ hổng bảo mật. Truy cập Shodan để lấy API key của bạn.
+Shodan API Setup:
+You will need a Shodan API key to use the vulnerability scanning feature. You can get your API key by signing up at Shodan.
 
-Cài đặt và sử dụng License:
-License file: Khi bạn chạy chương trình lần đầu tiên với tính năng enterprise, bạn sẽ được yêu cầu nhập API key và mã hóa nó vào tệp license.key.
-Cách sử dụng
-Kích hoạt Bản Quyền Enterprise:
-Nếu bạn chưa có bản quyền enterprise, chương trình sẽ yêu cầu nhập API key:
+License and Key Setup:
+License File: When you run the program for the first time with the enterprise feature, you will be asked to enter your API key, which will then be encrypted and saved in the license.key file.
 
-bash
-Copy code
+How to Use
+Activate Enterprise License:
+If you do not have an enterprise license, the program will ask you to enter an API key:
 python main.py --enterprise
-Các tính năng chính:
-Quét Subdomain: Quét các subdomains của domain và kiểm tra chúng:
 
-bash
-Copy code
-python main.py --scan-subdomains example.com --wordlist wordlist.txt
-Quét DNS: Quét các bản ghi DNS của domain:
+Thank You and Contact
+Thank you for using NetworkScanner! If you have any questions or would like to contribute to the project, feel free to contact us or create an issue on GitHub.
 
-bash
-Copy code
-python main.py --dns example.com
-Quét Lỗ Hổng Bảo Mật (Shodan): Quét lỗ hổng bảo mật của một host:
+We are always happy to receive feedback and improve this tool to help you work more efficiently! 🚀
 
-bash
-Copy code
-python main.py --vuln-scan example.com
-Traceroute: Xem đường đi của gói tin đến host:
+License
+This project is licensed under the MIT License.
 
-bash
-Copy code
-python main.py --traceroute example.com
-Giám sát Mạng (Wireshark): Giám sát gói tin mạng trực tiếp từ interface:
-
-bash
-Copy code
-sudo python main.py --wireshark eth0
-Quét Các Thiết Bị Kết Nối: Quét các thiết bị trong mạng của bạn:
-
-bash
-Copy code
-python main.py --scan-devices 192.168.1.0/24
-Quét Thư Mục Website (Dirbuster): Quét các thư mục ẩn của website:
-
-bash
-Copy code
-python main.py --dirbust example.com wordlist.txt
-WHOIS: Lấy thông tin WHOIS của một domain:
-
-bash
-Copy code
-python main.py --whois example.com
-Tìm Địa Chỉ MAC: Tìm địa chỉ MAC của một thiết bị:
-
-bash
-Copy code
-python main.py --get-mac 192.168.1.100
-Cảm ơn và Liên hệ
-Cảm ơn bạn đã sử dụng NetworkScanner! Nếu bạn có bất kỳ câu hỏi nào hoặc muốn đóng góp cho dự án, đừng ngần ngại liên hệ với chúng tôi hoặc tạo một issue trên GitHub.
-
-Chúng tôi luôn sẵn lòng nhận phản hồi và cải tiến công cụ này để giúp bạn làm việc hiệu quả hơn! 🚀
-
-Giấy phép
-Dự án này được cấp phép dưới Giấy phép MIT.
+Enjoy scanning and have fun with NetworkScanner! 🎉
