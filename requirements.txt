@@ -11,3 +11,4 @@ python-whois
 pyshark
 mysql
 psycopg2
+redis
