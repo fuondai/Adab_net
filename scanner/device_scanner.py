@@ -43,7 +43,12 @@ def print_device_list(devices):
         print("-" * 60)
         
         for device in devices:
-            hostname = device.get('hostname', 'Unknown')
-            print(f"{device['host']:<20}{hostname:<30}{device['mac']}")
+            # Kiểm tra 'hostname' và 'mac', thay thế 'None' bằng 'Unknown' nếu cần
+            hostname = device.get('hostname', 'Unknown') if device.get('hostname') else 'Unknown'
+            mac_address = device.get('mac', 'Unknown') if device.get('mac') else 'Unknown'
+            
+            print(f"{device['host']:<20}{hostname:<30}{mac_address}")
     else:
         print(f"[{Fore.RED}!{Style.RESET_ALL}] No devices found.")
+
+

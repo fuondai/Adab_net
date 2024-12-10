@@ -1,0 +1,9 @@
+admin
+upload
+uploads
+folder
+images
+test
+test1
+test2
+test3

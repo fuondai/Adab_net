@@ -1,6 +1,7 @@
 import os
 from scapy.all import Ether, ARP, srp
 from colorama import Fore, Style
+import socket
 
 def get_mac_address(host_ip, timeout=2, retries=5):
     """Lấy địa chỉ MAC của một địa chỉ IP cụ thể.
@@ -15,6 +16,13 @@ def get_mac_address(host_ip, timeout=2, retries=5):
     """
     if os.geteuid() != 0:
         print(f"{Fore.RED}[!] Permission error: You need root privileges for this feature.{Style.RESET_ALL}")
+        return None
+
+    # Kiểm tra kết nối mạng
+    try:
+        socket.create_connection(('8.8.8.8', 53), timeout=timeout)
+    except OSError:
+        print(f"{Fore.RED}[!] No network connection found.{Style.RESET_ALL}")
         return None
 
     print(f"\n{Fore.YELLOW}[?] Trying to get MAC address of {host_ip}...{Style.RESET_ALL}")

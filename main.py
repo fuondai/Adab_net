@@ -25,10 +25,24 @@ from scanner.wireshark_scanner import start_packet_capture
 
 def load_secret_key():
     """Load khóa bí mật từ file."""
-    if not os.path.exists(SECRET_KEY_FILE):
-        raise FileNotFoundError("Secret key file not found. Please generate it first.")
+    # Kiểm tra xem file 'secret.key' có tồn tại trong cùng thư mục với main.py không
+    if not os.path.isfile(SECRET_KEY_FILE):
+        # In thông báo lỗi nếu file không tồn tại
+        print(f"{Fore.RED}[!] Error: The secret key file '{SECRET_KEY_FILE}' is missing or could not be loaded. Are you using a cracked version?{Style.RESET_ALL}")
+        return None
+    
     with open(SECRET_KEY_FILE, "rb") as key_file:
-        return key_file.read()
+        secret_key = key_file.read()
+    
+    try:
+        # Thử khởi tạo Fernet với khóa đọc được để kiểm tra tính hợp lệ
+        Fernet(secret_key)
+    except Exception as e:
+        print(f"{Fore.RED}[!] Error: The secret key file '{SECRET_KEY_FILE}' is invalid. Flag{{Wh0_Cr4ck_A_0p3n_S0ur3}}{Style.RESET_ALL}")
+        return None
+
+    return secret_key
+
 
 def encrypt_api_key(api_key):
     """Mã hóa API key và lưu vào file LICENSE_FILE."""
@@ -82,26 +96,20 @@ def verify_license_key(api_key):
     return False
     
 def main():
-
+    
     # Kiểm tra xem enterprise đã kích hoạt chưa
     saved_api_key = decrypt_api_key()
     enterprise_activated = saved_api_key is not None
     print_logo(is_enterprise=enterprise_activated)
-         
+
+    # Load secret key và kiểm tra nếu khóa hợp lệ
+    secret_key = load_secret_key()
+    if secret_key is None:
+        return  # Dừng chương trình nếu khóa bí mật không hợp lệ
+        
     # Parse command-line arguments
     args = parse_args()
-       
-    # Quét subdomain nếu người dùng sử dụng tùy chọn --scan-subdomains
-    if args.scan_subdomains:
-        domain = args.scan_subdomains
-        if not args.wordlist:
-            print(f"[{Fore.RED}!{Style.RESET_ALL}] Error: You must provide a wordlist with --wordlist.")
-            return
-
-        wordlist = args.wordlist  # Đọc đường dẫn wordlist từ dòng lệnh
-        sdenum(domain, wordlist)  # Gọi module quét subdomain
-        return
-        
+    
     # Nếu người dùng chọn chế độ enterprise và chưa kích hoạt bản quyền
     if args.enterprise and not enterprise_activated:
         api_key = input("Enter API KEY: ").strip()
@@ -112,6 +120,17 @@ def main():
         print("Enterprise license activated successfully!")
         enterprise_activated = True
         exit()
+                
+    # Quét subdomain nếu người dùng sử dụng tùy chọn --scan-subdomains
+    if args.scan_subdomains:
+        domain = args.scan_subdomains
+        if not args.wordlist:
+            print(f"[{Fore.RED}!{Style.RESET_ALL}] Error: You must provide a wordlist with --wordlist.")
+            return
+
+        wordlist = args.wordlist  # Đọc đường dẫn wordlist từ dòng lệnh
+        sdenum(domain, wordlist)  # Gọi module quét subdomain
+        return
     
     # Device Scan
     if args.scan_devices:
@@ -152,27 +171,31 @@ def main():
         interface = args.wireshark
         start_packet_capture(interface)  
         
-    # Firectory Busting
+    # Directory Busting
     if args.dirbust:
         host, wordlist = args.dirbust
         dirbust(host, wordlist)
         return
-    	
+
+    # Nếu chỉ quét xác thực, bỏ qua quét cổng
+    if args.auth:
+        perform_security_scans(targets, args)
+        return
+        
     # Validate and process targets
     targets = process_targets(args)
     if not targets:
+        return
+        	        
+    # Specialized scans
+    if args.sn or args.sS or args.sT or args.sU:
+        perform_specialized_scans(targets, args)
         return
 
     # Port scanning
     if args.ports:
         perform_port_scan(targets, args)
-
-    # Specialized scans
-    perform_specialized_scans(targets, args)
-
-    # Authentication and vulnerability scanning
-    perform_security_scans(targets, args)
-
+        
 def print_logo(is_enterprise=False):
     init(autoreset=True)
     if is_enterprise:
@@ -180,7 +203,7 @@ def print_logo(is_enterprise=False):
 {Fore.YELLOW}{Style.BRIGHT}
     ___       __      __               __ 
    /   | ____/ /___ _/ /_  ____  ___  / /_
-  / /| |/ __  / __ `/ __ \/ __ \/ _ \/ __/
+  / /| |/ __  / __ / __ \/ __ \/ _ \/ __/
  / ___ / /_/ / /_/ / /_/ / / / /  __/ /_  
 /_/  |_\__,_/\__,_/_.___/_/ /_/\___/\__/  
    _   _   _   _   _   _   _   _   _   _  
@@ -194,7 +217,7 @@ def print_logo(is_enterprise=False):
 {Fore.CYAN}{Style.BRIGHT}
     ___       __      __               __ 
    /   | ____/ /___ _/ /_  ____  ___  / /_
-  / /| |/ __  / __ `/ __ \/ __ \/ _ \/ __/
+  / /| |/ __  / __ / __ \/ __ \/ _ \/ __/
  / ___ / /_/ / /_/ / /_/ / / / /  __/ /_  
 /_/  |_\__,_/\__,_/_.___/_/ /_/\___/\__/                                            
 {Style.RESET_ALL}
@@ -213,6 +236,30 @@ def perform_dns_scan(domains):
 
 def process_targets(args):
     """Process and validate target inputs."""
+    # Nếu có --scan-subdomains, không cần parse target từ file hay địa chỉ IP
+    if args.scan_subdomains:
+        return [args.scan_subdomains]    
+
+    # Kiểm tra nếu có --get-mac, xử lý mục tiêu
+    if args.get_mac:
+        # Trả về mục tiêu cho quét MAC
+        return [args.get_mac]
+        
+    # Kiểm tra nếu có --dns, xử lý mục tiêu
+    if args.dns:
+        # Nếu có --dns, ta sẽ trả về mục tiêu cho quét DNS
+        return [args.dns]
+        
+    # Kiểm tra nếu có --dirbust, xử lý mục tiêu
+    if args.dirbust:
+        host = args.dirbust[0]  # Mục tiêu (host)
+        wordlist = args.dirbust[1]  # Wordlist
+        return [(host, wordlist)]  # Trả về tuple chứa host và wordlist cho việc quét
+        
+    # Nếu có --scan-devices, sử dụng giá trị đó làm mục tiêu
+    if args.scan_devices:
+        # Trả về một danh sách với địa chỉ mạng được quét
+        return [args.scan_devices]
     # Check for conflicting target inputs
     if args.file and args.targets:
         print("Error: Specify targets either directly or through a file, not both.")
@@ -275,22 +322,56 @@ def perform_specialized_scans(targets, args):
     for scan_type, (scan_name, result_label) in scan_types.items():
         if getattr(args, scan_type):
             scanner = SpecializedScanner(
-                targets, 
+                targets,
                 scan_type=scan_type,
                 ports=args.ports if scan_type != 'sn' else None
             )
             results = scanner.scan()
-            
-            print(f"{scan_name} Results:")
+
+            # In tiêu đề quét
+            print(f"\n{Fore.CYAN}{'-' * 50}")
+            print(f"{scan_name} Results")
+            print(f"{'-' * 50}{Style.RESET_ALL}")
+
+            # Kiểm tra nếu không có kết quả
+            if not results:
+                print(f"{Fore.RED}No {result_label} found.{Style.RESET_ALL}")
+                continue
+
+            # In tiêu đề cột
+            print(f"{'Target':<20}{'Port':<8}{'Status':<10}")
+            print(f"{'-' * 40}")
+
+            # In kết quả từng dòng
             for result in results:
-                print(result)
+                if ':' in result:
+                    target, port = result.split(':')
+                    print(f"{Fore.GREEN}{target:<20}{port:<8}{'Open':<10}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.GREEN}{result:<20}{'':<8}{'Up':<10}{Style.RESET_ALL}")
+
+            print(f"{Fore.CYAN}{'-' * 50}{Style.RESET_ALL}")
+
 
 def perform_security_scans(targets, args):
     """Perform authentication scanning."""
     if args.auth:
         auth_scanner = AuthScanner(targets, credentials_file=args.creds)
-        auth_results = auth_scanner.scan()
-        print_auth_results(auth_results)
+        
+        # Common Services
+        ports_services = {
+            21: ("ftp", auth_scanner._check_ftp),
+            22: ("ssh", auth_scanner._check_ssh),
+            23: ("telnet", auth_scanner._check_telnet),
+            25: ("smtp", auth_scanner._check_smtp),
+            #3306: ("mysql", auth_scanner._check_mysql),        
+            5432: ("postgresql", auth_scanner._check_postgresql), 
+            6379: ("redis", auth_scanner._check_redis),        
+            80: ("http", auth_scanner._check_http_basic_auth)  
+        }
+
+        auth_results = auth_scanner.scan(ports_services)
+
 
     # Ping and ARP scans
     if args.ping_check:
@@ -298,16 +379,6 @@ def perform_security_scans(targets, args):
 
     if args.arp:
         perform_arp_scan(targets, args.iface)
-
-def print_auth_results(auth_results):
-    """Print authentication scanning results."""
-    print("Authentication Scanning Results:")
-    for host, results in auth_results.items():
-        print(f"{host}:")
-        for service, creds in results.items():
-            print(f"  {service.upper()} Vulnerable Credentials:")
-            for username, password in creds:
-                print(f"    {username}:{password}")
 
 def perform_ping_check(targets):
     """Perform ping check on targets."""
