@@ -1,8 +1,20 @@
+# shodan_scan.py
+
 import shodan
 import requests
 import time
 import sys
 from colorama import Fore, Style
+
+def get_user_api_key():
+    """Yêu cầu người dùng nhập API Key."""
+    print(f"[{Fore.YELLOW}?{Style.RESET_ALL}] Bạn cần một API key từ Shodan để sử dụng các tính năng này.")
+    print(f"[{Fore.YELLOW}?{Style.RESET_ALL}] Để lấy API key, bạn có thể đăng nhập vào Shodan tại: https://www.shodan.io")
+    api_key = input(f"[?] Nhập API key của bạn: ").strip()
+    if not api_key:
+        print(f"[{Fore.RED}!{Style.RESET_ALL}] Bạn chưa nhập API key. Chương trình sẽ kết thúc.")
+        sys.exit(1)
+    return api_key
 
 
 def get_host_ip(target, api_key):
@@ -22,12 +34,13 @@ def get_host_ip(target, api_key):
 
 def vulnscan(host, api_key):
     """Perform vulnerability scanning using Shodan API."""
+    print(f"[{Fore.YELLOW}?{Style.RESET_ALL}] Sử dụng API key: {api_key}")
     try:
         print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Vulnerability scanning on {Fore.YELLOW}{host}{Style.RESET_ALL}...')
-        
+
         # Initialize Shodan API client
         api = shodan.Shodan(api_key)
-        
+
         # Resolve host to IP address
         host_ip = get_host_ip(host, api_key)
         if not host_ip:

@@ -53,7 +53,7 @@ def parse_args():
                             "- All ports: '-' or 'all'\n"
                             f"Default: {','.join(map(str, common_ports))}"
                         ))
-    
+
     # DNS scanning
     parser.add_argument('--dns', nargs='+', 
                         help="List of domains to scan for DNS records")
