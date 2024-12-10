@@ -10,3 +10,4 @@ shodan
 python-whois
 pyshark
 mysql
+psycopg2
