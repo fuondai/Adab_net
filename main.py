@@ -18,7 +18,7 @@ from scanner.thank_you import welcome
 from scanner.dirbuster import dirbust
 from scanner.device_scanner import scan_local_devices, print_device_list
 from scanner.subdomain_scanner import sdenum
-from scanner.vuln_scanner import vulnscan
+from scanner.vuln_scanner import get_user_api_key, vulnscan
 from scanner.whois_scanner import whoisinfo
 from scanner.traceroute_scanner import tracert
 from scanner.wireshark_scanner import start_packet_capture
@@ -90,7 +90,7 @@ def main():
          
     # Parse command-line arguments
     args = parse_args()
-    
+       
     # Quét subdomain nếu người dùng sử dụng tùy chọn --scan-subdomains
     if args.scan_subdomains:
         domain = args.scan_subdomains
@@ -134,11 +134,9 @@ def main():
         
     # Vuln Scan
     if args.vuln_scan:
-        host = args.vuln_scan
-        api_key = "your_shodan_api_key_here"  
-        vulnscan(host, api_key)
+        perform_vuln_scan(args.vuln_scan)
         return
-            
+         
     # MAC FIND
     if args.get_mac:
         get_mac_address(args.get_mac) 
@@ -238,6 +236,10 @@ def process_targets(args):
         return []
 
     return targets
+
+def perform_vuln_scan(host):
+    api_key = get_user_api_key()
+    vulnscan(host, api_key)
 
 def perform_port_scan(targets, args):
     """Perform port scanning on specified targets."""
