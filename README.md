@@ -28,14 +28,14 @@ list of the most common options.
 Contributing
 ------------
 ```bash
-Phuong Dai
+Phuong Dai 🧔
 ```
 ```bash
-Thien An
+Thien An 🤵
 ```
 ```bash
-Cong Danh
+Cong Danh 🧑
 ```
 ```bash
-Huu Binh
+Huu Binh 🧑‍🦱
 ```
