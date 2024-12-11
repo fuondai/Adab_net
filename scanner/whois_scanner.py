@@ -12,7 +12,6 @@ def whoisinfo(host):
     else:
         display_whois_info(host, whois_info)
 
-
 def display_whois_info(host, whois_info):
     """Hiển thị thông tin WHOIS của host."""
     if isinstance(whois_info.domain_name, str):
@@ -48,7 +47,6 @@ def display_whois_info(host, whois_info):
     print(f'[{Fore.GREEN}+{Style.RESET_ALL}] State: {Fore.GREEN}{whois_info.state}{Style.RESET_ALL}')
     print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Country: {Fore.GREEN}{whois_info.country}{Style.RESET_ALL}\n')
 
-
 def handle_date_field(host, date_field):
     """Xử lý trường dữ liệu ngày tháng trong thông tin WHOIS."""
     if isinstance(date_field, list):
@@ -56,7 +54,6 @@ def handle_date_field(host, date_field):
         whois_checker(host, date_field)
     else:
         print(f'[{Fore.GREEN}+{Style.RESET_ALL}] {date_field}')
-
 
 def whois_checker(host, dictionary):
     """Kiểm tra và in các giá trị từ danh sách hoặc chuỗi WHOIS."""

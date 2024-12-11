@@ -4,8 +4,8 @@
  / ___ / /_/ / /_/ / /_/ / / / /  __/ /_    ___/ / /__/ /_/ / / / / / / /  __/ /    
 /_/  |_\__,_/\__,_/_.___/_/ /_/\___/\__/   /____/\___/\__,_/_/ /_/_/ /_/\___/_/     
                                                                                                                                        
-NetworkScanner/
-├── scanner/			  # 🛠️ Các công cụ quét siêu mạnh mẽ!
+📁NetworkScanner/
+├── 📁scanner/			  # 🛠️ Các công cụ quét siêu mạnh mẽ!
 │   ├── __init__.py               # 👷‍♂️ File khởi tạo module (rỗng), mở đầu cho cuộc hành trình quét!
 │   ├── cli.py                    # 📡 Các lệnh siêu dễ thương để bạn chạy trên dòng lệnh (command-line arguments)
 │   ├── core.py                   # 🧠 Bộ não của dự án, chứa các chức năng chính như quét dịch vụ, ping, ARP
@@ -24,21 +24,30 @@ NetworkScanner/
 │   ├── license_manager.py        # 🛡️ Quản lý bản quyền API, giúp bạn giữ an toàn với API keys
 │   └── utils.py                  # ⚙️ Các hàm tiện ích hỗ trợ, giúp công việc trở nên dễ dàng hơn
 │
-├── server/
+├── 📁server/
 │   ├── create_secret_key.py      # 🔑 Khởi tạo sercet.key
-│   └── server.py                 # 🔒 Server xác nhận key
+│   ├── server.py                 # 🔒 Server xác nhận key
+│   ├── localhost_server.py       # 🔒 Testing Server 
+│   ├── notjail.py	          # 🔒 Testing Server 
+│   └── 📁test_directory/	  # 🔒 Testing Directory
+│       ├── 📁admin/            
+│       ├── 📁images/                    
+│       ├── 📁uploads/
+│	└──index.html
 │
-├── wordlists/			  # 📚 Thư mục Wordlists
+├── 📁wordlists/	          # 📚 Thư mục Wordlists
 │   ├── directory-list-1.0.txt    
 │   ├── directory-list-2.3-small.txt                 
-│   └── directory-list-2.3-medium.txt
+│   ├── directory-list-2.3-medium.txt
+│   └── test.txt
 │
-├── tests/			  
+├── 📁tests/			  
 │   └─ test_core.py    		  # ⚙️ Kiểm tra công cụ
 │ 
 ├── folder_tree.txt               # Cấu trúc thư mục của dự án (Bạn đang ở đây 📍)
 ├── main.py                       # 🚀 Điểm bắt đầu của hành trình quét mạng, hãy khởi động!
 ├── requirements.txt              # 📜 Các thứ bạn cần cài đặt để làm cho mọi thứ hoạt động
 ├── license.key                   # 🔑 Bí mật API key của bạn (đừng làm mất nhé!)
-├── secret.key                    # 🔒 Khóa bảo mật dùng để mã hóa API key
-└── README.md                     # 📚 Tài liệu hướng dẫn bạn cách làm mọi thứ (đừng bỏ qua nhé!)
+├── secret.key                    # 🔒 Khóa bảo mật dùng để xác minh và mã hóa API key
+├── README.md                     # 📚 Tài liệu hướng dẫn bạn cách làm mọi thứ (đừng bỏ qua nhé!)
+└── setup.py                      # ⚙️ Tự động cài đặt cái thư viện cần thiết. Tiện lợi quá iiii!

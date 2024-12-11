@@ -25,7 +25,7 @@ class AuthScanner:
         self.results = {}
         self.lock = threading.Lock()
         self.semaphore = threading.Semaphore(max_threads)
-
+    
     def _load_credentials(self, credentials_file: str) -> List[Tuple[str, str]]:
         """Load credentials from a file or use default credentials"""
         default_creds = [
@@ -48,9 +48,9 @@ class AuthScanner:
         except Exception as e:
             print(f"Error loading credentials: {e}")
             return default_creds
-
+    
     # --- Service Check Methods ---
-
+    
     def _check_ftp(self, host: str, username: str, password: str) -> bool:
         try:
             ftp = ftplib.FTP(timeout=5)
@@ -60,7 +60,7 @@ class AuthScanner:
             return True
         except Exception:
             return False
-
+    
     def _check_telnet(self, host: str, username: str, password: str) -> bool:
         try:
             tn = telnetlib.Telnet(host, timeout=5)
@@ -73,7 +73,6 @@ class AuthScanner:
             return b"Welcome" in response or b"successful" in response
         except Exception:
             return False
-
     def _check_ssh(self, host: str, username: str, password: str) -> bool:
         try:
             client = paramiko.SSHClient()
@@ -83,7 +82,6 @@ class AuthScanner:
             return True
         except Exception:
             return False
-
     def _check_smtp(self, host: str, username: str, password: str) -> bool:
         try:
             smtp = smtplib.SMTP(host, timeout=5)
@@ -92,7 +90,6 @@ class AuthScanner:
             return True
         except Exception:
             return False
-
     def _check_postgresql(self, host: str, username: str, password: str) -> bool:
         try:
             connection = psycopg2.connect(host=host, user=username, password=password, connect_timeout=5)
@@ -100,7 +97,6 @@ class AuthScanner:
             return True
         except Exception:
             return False
-
     def _check_redis(self, host: str, password: str) -> bool:
         try:
             client = redis.StrictRedis(host=host, password=password, socket_timeout=5)
@@ -108,7 +104,6 @@ class AuthScanner:
             return True
         except Exception:
             return False
-
     def _check_http_basic_auth(self, host: str, username: str, password: str) -> bool:
         try:
             response = requests.get(f"http://{host}", auth=(username, password), timeout=5)
@@ -124,9 +119,9 @@ class AuthScanner:
         except Exception:
             return False
     """
-
+    
     # --- Host Scanning Method ---
-	
+    
     def _scan_host(self, host: str, port: int, service: str, check_function):
         for username, password in self.credentials:
             try:
@@ -137,16 +132,17 @@ class AuthScanner:
             except Exception:
                 pass
         self.semaphore.release()
-
+    
     # --- Main Scan Method ---
-
+    
     def scan(self, ports_services: Dict[int, Tuple[str, callable]]):
         threads = []
 
         for host in self.targets:
             for port, (service, check_function) in ports_services.items():
                 self.semaphore.acquire()
-                thread = threading.Thread(target=self._scan_host, args=(host, port, service, check_function))
+                thread = threading.Thread(target=self._scan_host, 
+                                          args=(host, port, service, check_function))
                 thread.start()
                 threads.append(thread)
 

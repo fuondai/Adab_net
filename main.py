@@ -177,16 +177,16 @@ def main():
         dirbust(host, wordlist)
         return
 
-    # Nếu chỉ quét xác thực, bỏ qua quét cổng
-    if args.auth:
-        perform_security_scans(targets, args)
-        return
-        
     # Validate and process targets
     targets = process_targets(args)
     if not targets:
         return
-        	        
+        
+    # Nếu chỉ quét xác thực, bỏ qua quét cổng
+    if args.auth:
+        perform_security_scans(targets, args)
+        return
+                
     # Specialized scans
     if args.sn or args.sS or args.sT or args.sU:
         perform_specialized_scans(targets, args)
