@@ -1,4 +1,4 @@
-# Network Security Tools
+# Adab Network Security Tools
 
 This is a collection of network security tools, including features such as WHOIS lookup, vulnerability scanning via Shodan, traceroute, network information gathering, and packet capturing. The toolkit is developed in Python and integrates various useful libraries.
 
@@ -12,7 +12,30 @@ This is a collection of network security tools, including features such as WHOIS
 
 ## Requirements
 
-To use these tools, you need to install the required dependencies. You can install them using `pip`:
+To use these tools, you need to install the required dependencies. You can install them using `pip` or using `setup.py`:
 
 ```bash
 pip install -r requirements.txt
+```
+```bash
+python setup.py
+```
+Using Adabnet
+----------
+Adabnet has a lot of features, but getting started is as easy as running `python main.py -h`. Running `main.py` without any parameters will give a helpful
+list of the most common options.
+
+Contributing
+------------
+```bash
+Phuong Dai
+```
+```bash
+Thien An
+```
+```bash
+Cong Danh
+```
+```bash
+Huu Binh
+```
