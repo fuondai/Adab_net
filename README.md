@@ -18,7 +18,7 @@ To use these tools, you need to install the required dependencies. You can insta
 pip install -r requirements.txt
 ```
 ```bash
-python setup.py
+python setup.py install
 ```
 Using Adabnet
 ----------
