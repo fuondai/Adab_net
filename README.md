@@ -31,7 +31,7 @@ Contributing
 Phuong Dai 🧔
 ```
 ```bash
-Thien An 🤵
+Thien An 🧑‍🦰
 ```
 ```bash
 Cong Danh 🧑
