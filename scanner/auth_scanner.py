@@ -4,49 +4,54 @@ import paramiko
 import smtplib
 import socket
 import threading
+#import mysql.connector
+import psycopg2
+import redis
+import requests
 from typing import List, Dict, Tuple
 
+
 class AuthScanner:
-    def __init__(self, targets: List[str], credentials_file: str = None):
+    def __init__(self, targets: List[str], credentials_file: str = None, max_threads: int = 50):
         """
         Initialize AuthScanner with targets and optional credentials file
-        
+
         :param targets: List of target IPs or hostnames
         :param credentials_file: Path to file with credentials (optional)
+        :param max_threads: Maximum number of concurrent threads
         """
         self.targets = targets
         self.credentials = self._load_credentials(credentials_file)
         self.results = {}
-        
+        self.lock = threading.Lock()
+        self.semaphore = threading.Semaphore(max_threads)
+
     def _load_credentials(self, credentials_file: str) -> List[Tuple[str, str]]:
-        """
-        Load credentials from a file or use default credentials
-        
-        :param credentials_file: Path to credentials file
-        :return: List of (username, password) tuples
-        """
+        """Load credentials from a file or use default credentials"""
         default_creds = [
             ('admin', 'admin'),
             ('root', 'root'),
             ('user', 'user'),
             ('test', 'test'),
             ('admin', ''),
+            ('msfadmin', 'msfadmin'),
             ('', '')
         ]
-        
+
         if not credentials_file:
             return default_creds
-        
+
         try:
             with open(credentials_file, 'r') as f:
-                custom_creds = [tuple(line.strip().split(':')) for line in f]
+                custom_creds = [tuple(line.strip().split(':')) for line in f if ':' in line]
                 return custom_creds + default_creds
         except Exception as e:
             print(f"Error loading credentials: {e}")
             return default_creds
-    
+
+    # --- Service Check Methods ---
+
     def _check_ftp(self, host: str, username: str, password: str) -> bool:
-        """Check FTP authentication"""
         try:
             ftp = ftplib.FTP(timeout=5)
             ftp.connect(host)
@@ -55,9 +60,8 @@ class AuthScanner:
             return True
         except Exception:
             return False
-    
+
     def _check_telnet(self, host: str, username: str, password: str) -> bool:
-        """Check Telnet authentication"""
         try:
             tn = telnetlib.Telnet(host, timeout=5)
             tn.read_until(b"login: ")
@@ -69,9 +73,8 @@ class AuthScanner:
             return b"Welcome" in response or b"successful" in response
         except Exception:
             return False
-    
+
     def _check_ssh(self, host: str, username: str, password: str) -> bool:
-        """Check SSH authentication"""
         try:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -80,9 +83,8 @@ class AuthScanner:
             return True
         except Exception:
             return False
-    
+
     def _check_smtp(self, host: str, username: str, password: str) -> bool:
-        """Check SMTP authentication"""
         try:
             smtp = smtplib.SMTP(host, timeout=5)
             smtp.login(username, password)
@@ -90,58 +92,65 @@ class AuthScanner:
             return True
         except Exception:
             return False
-    
-    def _scan_host(self, host: str, port: int = 21):
-        """Scan a single host for authentication vulnerabilities"""
-        host_results = {
-            'ftp': [],
-            'telnet': [],
-            'ssh': [],
-            'smtp': []
-        }
-        
+
+    def _check_postgresql(self, host: str, username: str, password: str) -> bool:
+        try:
+            connection = psycopg2.connect(host=host, user=username, password=password, connect_timeout=5)
+            connection.close()
+            return True
+        except Exception:
+            return False
+
+    def _check_redis(self, host: str, password: str) -> bool:
+        try:
+            client = redis.StrictRedis(host=host, password=password, socket_timeout=5)
+            client.ping()
+            return True
+        except Exception:
+            return False
+
+    def _check_http_basic_auth(self, host: str, username: str, password: str) -> bool:
+        try:
+            response = requests.get(f"http://{host}", auth=(username, password), timeout=5)
+            return response.status_code == 200
+        except Exception:
+            return False
+    """      
+    def _check_mysql(self, host: str, username: str, password: str) -> bool:
+        try:
+            connection = mysql.connector.connect(host=host, user=username, password=password, connect_timeout=5)
+            connection.close()
+            return True
+        except Exception:
+            return False
+    """
+
+    # --- Host Scanning Method ---
+	
+    def _scan_host(self, host: str, port: int, service: str, check_function):
         for username, password in self.credentials:
             try:
-                if port == 21:  # FTP
-                    if self._check_ftp(host, username, password):
-                        host_results['ftp'].append((username, password))
-                
-                elif port == 23:  # Telnet
-                    if self._check_telnet(host, username, password):
-                        host_results['telnet'].append((username, password))
-                
-                elif port == 22:  # SSH
-                    if self._check_ssh(host, username, password):
-                        host_results['ssh'].append((username, password))
-                
-                elif port == 25:  # SMTP
-                    if self._check_smtp(host, username, password):
-                        host_results['smtp'].append((username, password))
+                if check_function(host, username, password):
+                    with self.lock:
+                        print(f"[+] {service.upper()} login successful on {host}:{port} with {username}/{password}")
+                        self.results.setdefault(host, []).append((service, port, username, password))
             except Exception:
                 pass
-        
-        # Only store results with successful credentials
-        filtered_results = {k: v for k, v in host_results.items() if v}
-        if filtered_results:
-            self.results[host] = filtered_results
-    
-    def scan(self, ports: List[int] = None):
-        """
-        Perform authentication scanning on targets
-        
-        :param ports: List of ports to scan (default: [21, 22, 23, 25])
-        :return: Dictionary of scan results
-        """
-        ports = ports or [21, 22, 23, 25]
+        self.semaphore.release()
+
+    # --- Main Scan Method ---
+
+    def scan(self, ports_services: Dict[int, Tuple[str, callable]]):
         threads = []
-        
+
         for host in self.targets:
-            for port in ports:
-                thread = threading.Thread(target=self._scan_host, args=(host, port))
+            for port, (service, check_function) in ports_services.items():
+                self.semaphore.acquire()
+                thread = threading.Thread(target=self._scan_host, args=(host, port, service, check_function))
                 thread.start()
                 threads.append(thread)
-        
+
         for thread in threads:
             thread.join()
-        
+
         return self.results
