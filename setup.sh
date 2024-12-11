@@ -17,6 +17,6 @@ fi
 
 # Install the required libraries
 echo "Installing Python libraries..."
-pip3 install socket scapy ipaddress threading argparse prettytable nmap colorama requests cryptography ftplib telnetlib paramiko smtplib shodan whois pyshark
+pip3 install socket scapy ipaddress threading argparse prettytable nmap colorama requests cryptography ftplib telnetlib paramiko smtplib shodan whois mysql pyshark
 
 echo "Installation complete!"
