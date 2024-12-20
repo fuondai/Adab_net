@@ -2,27 +2,37 @@ import os
 import random
 import time
 import subprocess
+import requests
 from colorama import Fore, Back, Style
-from cryptography.fernet import Fernet
+
+# Biến global để theo dõi trạng thái hiển thị
+_banner_shown = False
+_api_key_verified = False
 
 def verify_api_key(api_key: str) -> bool:
-    """Xác thực API key"""
-    try:
-        # Đọc secret key
-        with open("secret.key", "rb") as key_file:
-            secret_key = key_file.read()
-            
-        # Đọc license key đã mã hóa
-        with open("license.key", "rb") as license_file:
-            encrypted_license = license_file.read()
-            
-        # Giải mã license key
-        f = Fernet(secret_key)
-        decrypted_license = f.decrypt(encrypted_license).decode()
+    """Xác thực API key với server"""
+    global _api_key_verified
+    
+    # Nếu đã xác thực thành công trước đó thì trả về True
+    if _api_key_verified:
+        return True
         
-        # So sánh với API key được cung cấp
-        return api_key == decrypted_license
-    except Exception:
+    try:
+        # Gửi request đến server để xác thực
+        response = requests.post(
+            "http://localhost:5000/verify",
+            json={"api_key": api_key},
+            timeout=5
+        )
+        
+        # Kiểm tra response
+        if response.status_code == 200:
+            _api_key_verified = True
+            return True
+        return False
+        
+    except requests.exceptions.RequestException as e:
+        print(f"{Fore.RED}[!] Error connecting to license server: {e}{Style.RESET_ALL}")
         return False
 
 def intro():
@@ -34,7 +44,7 @@ def intro():
 	 █████╗ ██████╗  █████╗ ██████╗ ███╗   ██╗███████╗████████╗    ███████╗███╗   ██╗████████╗███████╗██████╗ ██████╗ ██████╗ ██╗███████╗███████╗
 	██╔══██╗██╔══██╗██╔══██╗██╔══██╗████╗  ██║██╔════╝╚══██╔══╝    ██╔════╝████╗  ██║╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██╔══██╗██║██╔════╝██╔════╝
 	███████║██║  ██║███████║██████╔╝██╔██╗ ██║█████╗     ██║       █████╗  ██╔██╗ ██║   ██║   █████╗  ██████╔╝██████╔╝██████╔╝██║███████╗█████╗  
-	██╔══██║██║  ██║██╔══██║██╔══██╗██║╚██╗██║██╔══╝     ██║       ██╔══╝  ██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██╔═══╝ ██╔══██╗██║╚════██║██╔══╝  
+	���█╔══██║██║  ██║██╔══██║██╔══██╗██║╚██╗██║██╔══╝     ██║       ██╔══╝  ██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗██╔═══╝ ██╔══██╗██║╚════██║██╔══╝  
 	██║  ██║██████╔╝██║  ██║██████╔╝██║ ╚████║███████╗   ██║       ███████╗██║ ╚████║   ██║   ███████╗██║  ██║██║     ██║  ██║██║███████║███████╗
 	╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝       ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝
 
@@ -56,7 +66,7 @@ def intro():
 {Fore.YELLOW}Email:{Style.RESET_ALL} fuondai1314@gmail.com
 {Fore.YELLOW}License:{Style.RESET_ALL} MIT
 
-{Fore.GREEN}███{Fore.RED}███{Fore.GREEN}███{Fore.YELLOW}███{Fore.LIGHTBLUE_EX}███{Fore.MAGENTA}███{Fore.CYAN}███{Fore.WHITE}███
+{Fore.GREEN}███{Fore.RED}███{Fore.GREEN}███{Fore.YELLOW}███{Fore.LIGHTBLUE_EX}███{Fore.MAGENTA}██��{Fore.CYAN}███{Fore.WHITE}███
 {Fore.LIGHTBLACK_EX}███{Fore.LIGHTRED_EX}███{Fore.LIGHTGREEN_EX}███{Fore.LIGHTYELLOW_EX}███{Fore.BLUE}███{Fore.LIGHTMAGENTA_EX}███{Fore.LIGHTCYAN_EX}███{Fore.LIGHTWHITE_EX}███
 {Style.RESET_ALL}
 """
@@ -64,18 +74,23 @@ def intro():
 
 def welcome(api_key: str = None):
     """Hiển thị welcome banner và kiểm tra API key"""
-    # Clear screen
-    subprocess.call(['clear'] if os.name != 'nt' else ['cls'])
+    global _banner_shown
     
-    # Hiển thị intro
-    intro()
-    
-    # Kiểm tra API key nếu được cung cấp
-    if api_key and verify_api_key(api_key):
-        print(f"{Fore.GREEN}[+] Valid API key - Enterprise features activated{Style.RESET_ALL}")
-    
-    # Delay để người dùng đọc
-    time.sleep(3)
-    
-    # Clear screen again
-    subprocess.call(['clear'] if os.name != 'nt' else ['cls']) 
+    # Chỉ hiển thị banner khi chưa hiển thị trước đó và có API key hợp lệ
+    if not _banner_shown and api_key:
+        # Xác thực API key với server
+        if verify_api_key(api_key):
+            # Clear screen
+            subprocess.call(['clear'] if os.name != 'nt' else ['cls'])
+            
+            # Hiển thị intro
+            intro()
+            
+            print(f"{Fore.GREEN}[+] Valid API key - Enterprise features activated{Style.RESET_ALL}")
+            _banner_shown = True
+            
+            # Delay để người dùng đọc
+            time.sleep(3)
+            
+            # Clear screen again
+            subprocess.call(['clear'] if os.name != 'nt' else ['cls'])

@@ -12,3 +12,18 @@ pyjwt>=2.0.0
 flasgger>=0.9.5
 flask-limiter>=2.0.0
 pillow>=8.0.0
+
+# Scanner dependencies 
+python-nmap>=0.7.1
+dnspython>=2.1.0
+pyshark>=0.4.3
+shodan>=1.25.0
+beautifulsoup4>=4.9.3
+aiohttp>=3.8.1
+
+# Development dependencies
+pytest>=6.2.5
+pytest-cov>=2.12.1
+pylint>=2.11.1
+black>=21.9b0
+mypy>=0.910

@@ -1,49 +1,83 @@
-import pyshark
 import sys
 from colorama import Fore, Style
+from typing import List, Dict, Any, Optional
+from .base import BaseScanner
 
-def capture_packets(interface, packet_count=10, display_filter="ip"):
-    """
-    Capture packets from the given interface and print the packet details.
+# Thử import pyshark, nếu không có thì bỏ qua
+try:
+    import pyshark
+    PYSHARK_AVAILABLE = True
+except ImportError:
+    PYSHARK_AVAILABLE = False
 
-    :param interface: The network interface to listen on (e.g., 'eth0', 'wlan0').
-    :param packet_count: Number of packets to capture (default: 10).
-    :param display_filter: Display filter for packet capture (default: 'ip').
-    """
-    try:
-        print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Capturing packets on {Fore.YELLOW}{interface}{Style.RESET_ALL}...')
-        print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Display filter: {display_filter}')
-        
-        # Start capturing packets
-        capture = pyshark.LiveCapture(interface=interface, display_filter=display_filter)
-        
-        # Capture packets and display info
-        packet_count = 0
-        for packet in capture.sniff_continuously(packet_count=packet_count):
-            print_packet_info(packet)
+class PacketScanner(BaseScanner):
+    """Scanner để bắt và phân tích gói tin mạng"""
     
-    except KeyboardInterrupt:
-        print(f'\n[{Fore.RED}!{Style.RESET_ALL}] Capture interrupted by user.')
-        sys.exit(0)
-    except Exception as e:
-        print(f'[{Fore.RED}!{Style.RESET_ALL}] Error: {Fore.RED}{e}{Style.RESET_ALL}')
+    def __init__(self, targets: List[str], **kwargs):
+        super().__init__(targets, **kwargs)
+        self.interface = kwargs.get('interface', 'eth0')
+        self.packet_count = kwargs.get('packet_count', 10)
+        self.display_filter = kwargs.get('display_filter', 'ip')
+        self.results = {}
 
-def print_packet_info(packet):
-    """Print the details of a captured packet."""
-    try:
-        if hasattr(packet, 'ip'):
-            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Packet Info:')
-            print(f'  {Fore.YELLOW}Source IP:{Style.RESET_ALL} {packet.ip.src}')
-            print(f'  {Fore.YELLOW}Destination IP:{Style.RESET_ALL} {packet.ip.dst}')
-            print(f'  {Fore.YELLOW}Protocol:{Style.RESET_ALL} {packet.highest_layer}')
-            print(f'  {Fore.YELLOW}Packet Length:{Style.RESET_ALL} {packet.length} bytes')
-            print('-' * 50)
-        else:
-            print(f'[{Fore.RED}!{Style.RESET_ALL}] Non-IP packet detected, skipping...')
-    except AttributeError as e:
-        print(f'[{Fore.RED}!{Style.RESET_ALL}] Error parsing packet: {e}')
+    def scan(self) -> Dict[str, Any]:
+        """Thực hiện bắt gói tin trên interface."""
+        if not PYSHARK_AVAILABLE:
+            print(f"{Fore.YELLOW}[!] pyshark not found. This scanner requires pyshark.{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}[!] Install it with: pip install pyshark{Style.RESET_ALL}")
+            return self.results
 
-def start_packet_capture(interface='eth0', packet_count=10, display_filter="ip"):
-    """Start capturing packets on the specified interface."""
-    print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Starting packet capture on {Fore.YELLOW}{interface}{Style.RESET_ALL}...')
-    capture_packets(interface, packet_count, display_filter)
+        try:
+            print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Capturing packets on {Fore.YELLOW}{self.interface}{Style.RESET_ALL}...')
+            print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Display filter: {self.display_filter}')
+            
+            # Khởi tạo capture
+            capture = pyshark.LiveCapture(
+                interface=self.interface,
+                display_filter=self.display_filter
+            )
+            
+            # Bắt gói tin
+            packets = []
+            packet_count = 0
+            
+            for packet in capture.sniff_continuously(packet_count=self.packet_count):
+                info = self._print_packet_info(packet)
+                if info:
+                    packets.append(info)
+                packet_count += 1
+                if packet_count >= self.packet_count:
+                    break
+                    
+            self.results = {
+                'interface': self.interface,
+                'packet_count': len(packets),
+                'packets': packets
+            }
+
+        except KeyboardInterrupt:
+            print(f'\n[{Fore.RED}!{Style.RESET_ALL}] Capture interrupted by user.')
+        except Exception as e:
+            print(f'[{Fore.RED}!{Style.RESET_ALL}] Error: {Fore.RED}{e}{Style.RESET_ALL}')
+
+        return self.results
+
+    def print_results(self) -> None:
+        """In kết quả bắt gói tin."""
+        if not self.results:
+            print(f"{Fore.YELLOW}[!] No packet capture results to display{Style.RESET_ALL}")
+            return
+
+        print("\nPacket Capture Results:")
+        print("-" * 60)
+        
+        print(f"Interface: {Fore.CYAN}{self.results['interface']}{Style.RESET_ALL}")
+        print(f"Total Packets: {Fore.GREEN}{self.results['packet_count']}{Style.RESET_ALL}\n")
+        
+        for i, packet in enumerate(self.results['packets'], 1):
+            print(f"Packet #{i}:")
+            print(f"  Source IP: {Fore.GREEN}{packet['source_ip']}{Style.RESET_ALL}")
+            print(f"  Destination IP: {Fore.GREEN}{packet['dest_ip']}{Style.RESET_ALL}")
+            print(f"  Protocol: {Fore.YELLOW}{packet['protocol']}{Style.RESET_ALL}")
+            print(f"  Length: {packet['length']} bytes")
+            print("-" * 40)

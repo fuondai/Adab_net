@@ -1,69 +1,93 @@
 import whois
+from typing import List, Dict, Any
 from colorama import Fore, Style
+from .base import BaseScanner
 
+class WhoisScanner(BaseScanner):
+    """Scanner để truy vấn thông tin WHOIS"""
+    
+    def __init__(self, targets: List[str], **kwargs):
+        super().__init__(targets, **kwargs)
+        self.results = {}
 
-def whoisinfo(host):
-    """Quét thông tin WHOIS của một domain."""
-    try:
-        print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Retrieving WHOIS info for {Fore.YELLOW}{host}{Style.RESET_ALL}...')    
-        whois_info = whois.whois(host)
-    except Exception as e:
-        print(f'[{Fore.RED}!{Style.RESET_ALL}] Error: {e}')
-    else:
-        display_whois_info(host, whois_info)
+    def _handle_date_field(self, date_field) -> str:
+        """Xử lý trường dữ liệu ngày tháng."""
+        if isinstance(date_field, list):
+            return "\n\t".join(str(d) for d in date_field)
+        return str(date_field) if date_field else "Not available"
 
+    def _format_list_field(self, field) -> str:
+        """Format trường dữ liệu dạng list."""
+        if not field:
+            return "Not available"
+        if isinstance(field, list):
+            return "\n\t".join(str(f) for f in field)
+        return str(field)
 
-def display_whois_info(host, whois_info):
-    """Hiển thị thông tin WHOIS của host."""
-    if isinstance(whois_info.domain_name, str):
-        print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Domain name: {Fore.GREEN}{whois_info.domain_name}{Style.RESET_ALL}')
-    else:
-        print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Domain names:')
-        whois_checker(host, whois_info.domain_name)
+    def scan(self) -> Dict[str, Any]:
+        """Thực hiện quét WHOIS."""
+        for host in self.targets:
+            try:
+                print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Retrieving WHOIS info for {Fore.YELLOW}{host}{Style.RESET_ALL}...')    
+                whois_info = whois.whois(host)
+                
+                self.results[host] = {
+                    'domain_name': self._format_list_field(whois_info.domain_name),
+                    'registrar': whois_info.registrar,
+                    'whois_server': whois_info.whois_server,
+                    'name_servers': self._format_list_field(whois_info.name_servers),
+                    'creation_date': self._handle_date_field(whois_info.creation_date),
+                    'updated_date': self._handle_date_field(whois_info.updated_date),
+                    'expiration_date': self._handle_date_field(whois_info.expiration_date),
+                    'status': self._format_list_field(whois_info.status),
+                    'emails': self._format_list_field(whois_info.emails),
+                    'org': whois_info.org,
+                    'state': whois_info.state,
+                    'country': whois_info.country
+                }
+                
+            except Exception as e:
+                print(f'[{Fore.RED}!{Style.RESET_ALL}] Error: {e}')
+                self.results[host] = None
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Registrar: {Fore.GREEN}{whois_info.registrar}{Style.RESET_ALL}')
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] WHOIS server: {Fore.GREEN}{whois_info.whois_server}{Style.RESET_ALL}')
+        return self.results
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Name servers:')
-    whois_checker(host, whois_info.name_servers)
+    def print_results(self) -> None:
+        """In kết quả quét WHOIS."""
+        for host, info in self.results.items():
+            if not info:
+                print(f"\n[{Fore.RED}!{Style.RESET_ALL}] No WHOIS information found for {host}")
+                continue
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Creation date:')
-    handle_date_field(host, whois_info.creation_date)
+            print(f"\nWHOIS Information for {Fore.CYAN}{host}{Style.RESET_ALL}")
+            print("-" * 60)
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Updated date:')
-    handle_date_field(host, whois_info.updated_date)
+            # In thông tin domain
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Domain name: {Fore.GREEN}{info["domain_name"]}{Style.RESET_ALL}')
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Registrar: {Fore.GREEN}{info["registrar"]}{Style.RESET_ALL}')
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] WHOIS server: {Fore.GREEN}{info["whois_server"]}{Style.RESET_ALL}')
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Expiration date:')
-    handle_date_field(host, whois_info.expiration_date)
+            # In name servers
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Name servers:')
+            print(f'\t{Fore.GREEN}{info["name_servers"]}{Style.RESET_ALL}')
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Status:')
-    whois_checker(host, whois_info.status)
+            # In thông tin ngày tháng
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Creation date:')
+            print(f'\t{Fore.GREEN}{info["creation_date"]}{Style.RESET_ALL}')
+            
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Updated date:')
+            print(f'\t{Fore.GREEN}{info["updated_date"]}{Style.RESET_ALL}')
+            
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Expiration date:')
+            print(f'\t{Fore.GREEN}{info["expiration_date"]}{Style.RESET_ALL}')
 
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Email:')
-    whois_checker(host, whois_info.emails)
-
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Organization:')
-    whois_checker(host, whois_info.org)
-
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] State: {Fore.GREEN}{whois_info.state}{Style.RESET_ALL}')
-    print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Country: {Fore.GREEN}{whois_info.country}{Style.RESET_ALL}\n')
-
-
-def handle_date_field(host, date_field):
-    """Xử lý trường dữ liệu ngày tháng trong thông tin WHOIS."""
-    if isinstance(date_field, list):
-        print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Multiple dates:')
-        whois_checker(host, date_field)
-    else:
-        print(f'[{Fore.GREEN}+{Style.RESET_ALL}] {date_field}')
-
-
-def whois_checker(host, dictionary):
-    """Kiểm tra và in các giá trị từ danh sách hoặc chuỗi WHOIS."""
-    try:
-        length = len(dictionary)
-    except:
-        print(f'\t{Fore.GREEN}{dictionary}{Style.RESET_ALL}')
-    else:
-        for value in dictionary:
-            print(f'\t{Fore.GREEN}{value}{Style.RESET_ALL}')
+            # In status và thông tin liên hệ
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Status:')
+            print(f'\t{Fore.GREEN}{info["status"]}{Style.RESET_ALL}')
+            
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Emails:')
+            print(f'\t{Fore.GREEN}{info["emails"]}{Style.RESET_ALL}')
+            
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Organization: {Fore.GREEN}{info["org"]}{Style.RESET_ALL}')
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] State: {Fore.GREEN}{info["state"]}{Style.RESET_ALL}')
+            print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Country: {Fore.GREEN}{info["country"]}{Style.RESET_ALL}\n')

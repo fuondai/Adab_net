@@ -1,83 +1,93 @@
 # shodan_scan.py
 
-import shodan
-import requests
-import time
 import sys
 from colorama import Fore, Style
+from typing import List, Dict, Any
+from .base import BaseScanner
 
-def get_user_api_key():
-    """Yêu cầu người dùng nhập API Key."""
-    print(f"[{Fore.YELLOW}?{Style.RESET_ALL}] Bạn cần một API key từ Shodan để sử dụng các tính năng này.")
-    print(f"[{Fore.YELLOW}?{Style.RESET_ALL}] Để lấy API key, bạn có thể đăng nhập vào Shodan tại: https://www.shodan.io")
-    api_key = input(f"[?] Nhập API key của bạn: ").strip()
-    if not api_key:
-        print(f"[{Fore.RED}!{Style.RESET_ALL}] Bạn chưa nhập API key. Chương trình sẽ kết thúc.")
-        sys.exit(1)
-    return api_key
+# Thử import shodan, nếu không có thì bỏ qua
+try:
+    import shodan
+    SHODAN_AVAILABLE = True
+except ImportError:
+    SHODAN_AVAILABLE = False
 
-
-def get_host_ip(target, api_key):
-    """Resolve domain to IP using Shodan DNS resolve API."""
-    try:
-        dns_resolve_url = f'https://api.shodan.io/dns/resolve?hostnames={target}&key={api_key}'
-        resolved = requests.get(dns_resolve_url)
-        resolved.raise_for_status()  # Check for HTTP request errors
-
-        # Return resolved IP if successful
-        return resolved.json().get(target)
+class VulnScanner(BaseScanner):
+    """Scanner để quét lỗ hổng bảo mật"""
     
-    except requests.RequestException as e:
-        print(f'[{Fore.RED}!{Style.RESET_ALL}] Error resolving domain {target}: {e}')
-        return None
+    def __init__(self, targets: List[str], **kwargs):
+        super().__init__(targets, **kwargs)
+        self.api_key = kwargs.get('api_key')
+        self.results = {}
 
+    def scan(self) -> Dict[str, Any]:
+        """Thực hiện quét lỗ hổng."""
+        if not SHODAN_AVAILABLE:
+            print(f"{Fore.YELLOW}[!] shodan not found. This scanner requires shodan.{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}[!] Install it with: pip install shodan{Style.RESET_ALL}")
+            return self.results
 
-def vulnscan(host, api_key):
-    """Perform vulnerability scanning using Shodan API."""
-    print(f"[{Fore.YELLOW}?{Style.RESET_ALL}] Sử dụng API key: {api_key}")
-    try:
-        print(f'[{Fore.YELLOW}?{Style.RESET_ALL}] Vulnerability scanning on {Fore.YELLOW}{host}{Style.RESET_ALL}...')
+        if not self.api_key:
+            print(f"{Fore.RED}[!] Shodan API key is required{Style.RESET_ALL}")
+            return self.results
 
-        # Initialize Shodan API client
-        api = shodan.Shodan(api_key)
+        try:
+            api = shodan.Shodan(self.api_key)
+            
+            for target in self.targets:
+                print(f"[{Fore.YELLOW}*{Style.RESET_ALL}] Scanning {target} for vulnerabilities...")
+                try:
+                    # Quét thông tin host
+                    host = api.host(target)
+                    
+                    self.results[target] = {
+                        'ip': host.get('ip_str'),
+                        'os': host.get('os', 'Unknown'),
+                        'ports': host.get('ports', []),
+                        'vulns': host.get('vulns', []),
+                        'hostnames': host.get('hostnames', []),
+                        'domains': host.get('domains', [])
+                    }
+                    
+                except shodan.APIError as e:
+                    print(f"[{Fore.RED}!{Style.RESET_ALL}] Error scanning {target}: {e}")
+                    self.results[target] = None
 
-        # Resolve host to IP address
-        host_ip = get_host_ip(host, api_key)
-        if not host_ip:
+        except Exception as e:
+            print(f"[{Fore.RED}!{Style.RESET_ALL}] Error during vulnerability scan: {e}")
+
+        return self.results
+
+    def print_results(self) -> None:
+        """In kết quả quét lỗ hổng."""
+        if not self.results:
+            print(f"{Fore.YELLOW}[!] No vulnerability scan results to display{Style.RESET_ALL}")
             return
 
-        # Perform a Shodan search on that IP
-        host_info = api.host(host_ip)
-        print(f'[{Fore.GREEN}+{Style.RESET_ALL}] Target: {host}')
-        print(f"[{Fore.GREEN}+{Style.RESET_ALL}] IP: {host_info['ip_str']}")
-        print(f"[{Fore.GREEN}+{Style.RESET_ALL}] Organization: {host_info.get('org', 'n/a')}")
-        print(f"[{Fore.GREEN}+{Style.RESET_ALL}] Operating System: {host_info.get('os', 'n/a')}\n")
-
-        # Print all banners (ports and services)
-        for item in host_info['data']:
-            print(f"[{Fore.GREEN}+{Style.RESET_ALL}] Port: {Fore.GREEN}{item['port']}{Style.RESET_ALL}")
-            print(f"[{Fore.GREEN}+{Style.RESET_ALL}] Banner: {Fore.GREEN}{item['data']}{Style.RESET_ALL}")
-
-        # Print vulnerability information
-        if 'vulns' in host_info and len(host_info['vulns']) > 0:
-            print(f"[{Fore.GREEN}+{Style.RESET_ALL}] {len(host_info['vulns'])} vulnerability(ies) found on {Fore.YELLOW}{host}{Style.RESET_ALL}")
-            for vuln in host_info['vulns']:
-                CVE = vuln.replace('!', '')
-                print(f"\n[{Fore.GREEN}+{Style.RESET_ALL}] Vulnerability: {Fore.GREEN}{vuln}{Style.RESET_ALL}")
+        print("\nVulnerability Scan Results:")
+        print("-" * 60)
+        
+        for target, info in self.results.items():
+            print(f"\nTarget: {Fore.CYAN}{target}{Style.RESET_ALL}")
+            
+            if not info:
+                print(f"{Fore.RED}[!] Scan failed for this target{Style.RESET_ALL}")
+                continue
                 
-                # Wait a second to avoid hitting rate limits
-                time.sleep(1)
-                
-                # Fetch exploits for the CVE
-                exploits = api.exploits.search(CVE)
-                for exploit in exploits['matches']:
-                    print(f"Exploit description: {exploit.get('description', 'No description available')}")
-        else:
-            print(f"[{Fore.GREEN}+{Style.RESET_ALL}] No vulnerabilities found on {Fore.YELLOW}{host}{Style.RESET_ALL}.\n{Fore.YELLOW}Disclaimer{Style.RESET_ALL}: This doesn't mean the host isn't vulnerable.\n")
-
-    except KeyboardInterrupt:
-        sys.exit('^C\n')
-    except shodan.APIError as e:
-        print(f'[{Fore.RED}!{Style.RESET_ALL}] Shodan API error: {Fore.RED}{e}{Style.RESET_ALL}')
-    except Exception as e:
-        print(f'[{Fore.RED}!{Style.RESET_ALL}] Unexpected error: {Fore.RED}{e}{Style.RESET_ALL}')
+            print(f"IP: {Fore.GREEN}{info['ip']}{Style.RESET_ALL}")
+            print(f"OS: {Fore.GREEN}{info['os']}{Style.RESET_ALL}")
+            
+            if info['ports']:
+                print(f"\nOpen Ports:")
+                for port in info['ports']:
+                    print(f"  {Fore.GREEN}{port}{Style.RESET_ALL}")
+                    
+            if info['vulns']:
+                print(f"\nVulnerabilities:")
+                for vuln in info['vulns']:
+                    print(f"  {Fore.RED}{vuln}{Style.RESET_ALL}")
+                    
+            if info['hostnames']:
+                print(f"\nHostnames:")
+                for hostname in info['hostnames']:
+                    print(f"  {Fore.YELLOW}{hostname}{Style.RESET_ALL}")
