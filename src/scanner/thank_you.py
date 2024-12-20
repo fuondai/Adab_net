@@ -3,8 +3,30 @@ import random
 import time
 import subprocess
 from colorama import Fore, Back, Style
+from cryptography.fernet import Fernet
+
+def verify_api_key(api_key: str) -> bool:
+    """Xác thực API key"""
+    try:
+        # Đọc secret key
+        with open("secret.key", "rb") as key_file:
+            secret_key = key_file.read()
+            
+        # Đọc license key đã mã hóa
+        with open("license.key", "rb") as license_file:
+            encrypted_license = license_file.read()
+            
+        # Giải mã license key
+        f = Fernet(secret_key)
+        decrypted_license = f.decrypt(encrypted_license).decode()
+        
+        # So sánh với API key được cung cấp
+        return api_key == decrypted_license
+    except Exception:
+        return False
 
 def intro():
+    """Hiển thị logo và thông tin"""
     logo = f"""
 {Fore.CYAN}   
 ****************************************************************************************************************************************************************************
@@ -40,12 +62,20 @@ def intro():
 """
     print(logo)
 
-def welcome():
-    introList = [intro]
-    subprocess.call(['clear'] if os.name != 'nt' else ['cls'])  # Clear terminal screen based on OS
-    random.choice(introList)()  # Call random intro (even though we only have one for now)
-    time.sleep(5)
+def welcome(api_key: str = None):
+    """Hiển thị welcome banner và kiểm tra API key"""
+    # Clear screen
     subprocess.call(['clear'] if os.name != 'nt' else ['cls'])
-
-if __name__ == "__main__":
-    welcome()
+    
+    # Hiển thị intro
+    intro()
+    
+    # Kiểm tra API key nếu được cung cấp
+    if api_key and verify_api_key(api_key):
+        print(f"{Fore.GREEN}[+] Valid API key - Enterprise features activated{Style.RESET_ALL}")
+    
+    # Delay để người dùng đọc
+    time.sleep(3)
+    
+    # Clear screen again
+    subprocess.call(['clear'] if os.name != 'nt' else ['cls']) 

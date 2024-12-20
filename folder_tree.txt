@@ -1,8 +1,34 @@
-NetworkScanner/
+Adab_net/
 ├── src/                    # Source code
 │   ├── scanner/           # Scanner modules
+│   │   ├── __init__.py
+│   │   ├── auth_scanner.py
+│   │   ├── base.py
+│   │   ├── core.py
+│   │   ├── cve_scanner.py
+│   │   ├── device_scanner.py
+│   │   ├── dirbuster.py
+│   │   ├── dns_scanner.py
+│   │   ├── factory.py
+│   │   ├── mac_scanner.py
+│   │   ├── specialized_scan.py
+│   │   ├── subdomain_scanner.py
+│   │   ├── thank_you.py
+│   │   ├── traceroute_scanner.py
+│   │   ├── utils.py
+│   │   ├── vuln_scanner.py
+│   │   └── wireshark_scanner.py
 │   ├── server/            # Server modules
-│   └── exceptions.py      # Custom exceptions
+│   │   ├── __init__.py
+│   │   ├── api.py
+│   │   ├── config.py
+│   │   ├── create_secret_key.py
+│   │   ├── database.py
+│   │   ├── models.py
+│   │   └── server.py
+│   ├── __init__.py
+│   ├── exceptions.py      # Custom exceptions
+│   └── logging_config.py  # Logging configuration
 ├── docs/                  # Documentation
 │   ├── images/           # Images and assets
 │   │   └── logo.png      # Project logo
@@ -11,9 +37,19 @@ NetworkScanner/
 │   ├── api-reference.md  # API documentation
 │   └── contributing.md   # Contributing guidelines
 ├── tests/                 # Test files
+│   ├── __init__.py
+│   └── test_core.py
 ├── scripts/              # Utility scripts
 │   └── generate_logo.py  # Logo generation script
+├── logs/                 # Log files directory
 ├── main.py               # Main entry point
 ├── setup.py             # Package setup
-├── requirements.txt     # Dependencies
-└── README.md           # Project documentation
+├── setup.bat            # Windows setup script
+├── setup.sh             # Linux setup script
+├── run.bat             # Windows run script
+├── Dockerfile          # Docker configuration
+├── requirements.txt    # Dependencies
+├── LICENSE            # License file
+├── CONTRIBUTING.md    # Contributing guidelines
+├── .gitignore        # Git ignore file
+└── README.md         # Project documentation
