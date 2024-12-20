@@ -1,21 +1,25 @@
-import os
 from dataclasses import dataclass
 from typing import Optional
+import os
 
 @dataclass
-class ServerConfig:
-    """Configuration cho server"""
-    host: str = "0.0.0.0"
-    port: int = 5000
+class AppConfig:
+    """Application configuration"""
     debug: bool = False
+    testing: bool = False
+    database_url: str = "sqlite:///app.db"
     secret_key: Optional[str] = None
+    max_workers: int = 10
+    scan_timeout: int = 30
     
     @classmethod
-    def load_from_env(cls) -> 'ServerConfig':
+    def from_env(cls):
         """Load config từ environment variables"""
         return cls(
-            host=os.getenv('SERVER_HOST', '0.0.0.0'),
-            port=int(os.getenv('SERVER_PORT', '5000')),
-            debug=os.getenv('SERVER_DEBUG', '').lower() == 'true',
-            secret_key=os.getenv('SERVER_SECRET_KEY')
+            debug=os.getenv("APP_DEBUG", "false").lower() == "true",
+            testing=os.getenv("APP_TESTING", "false").lower() == "true",
+            database_url=os.getenv("DATABASE_URL", "sqlite:///app.db"),
+            secret_key=os.getenv("SECRET_KEY"),
+            max_workers=int(os.getenv("MAX_WORKERS", "10")),
+            scan_timeout=int(os.getenv("SCAN_TIMEOUT", "30"))
         ) 

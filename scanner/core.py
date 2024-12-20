@@ -4,7 +4,8 @@ import ipaddress
 import threading
 from scapy.all import conf, ICMP, IP, sr1, ARP, Ether, srp
 import logging
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logging.basicConfig(
     level=logging.INFO,
@@ -217,3 +218,23 @@ class ServiceVersionScanner:
             version = version_func(banner)
             return service, version
         return "unknown", "Unknown"
+
+def scan_parallel(targets: List[str], max_workers: int = 10) -> Dict[str, Any]:
+    """Quét song song nhiều targets"""
+    results = {}
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_target = {
+            executor.submit(scan_target, target): target 
+            for target in targets
+        }
+        
+        for future in as_completed(future_to_target):
+            target = future_to_target[future]
+            try:
+                results[target] = future.result()
+            except Exception as e:
+                logger.error(f"Error scanning {target}: {e}")
+                results[target] = None
+                
+    return results

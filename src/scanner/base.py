@@ -11,6 +11,20 @@ class BaseScanner(ABC):
         self.targets = targets
         self.options = kwargs
         self.results: Dict[str, Any] = {}
+        self._validate_targets()
+        
+    def _validate_targets(self) -> None:
+        """Validate danh sách targets"""
+        if not self.targets:
+            raise ValueError("Targets list cannot be empty")
+            
+    def _log_scan_start(self) -> None:
+        """Log bắt đầu quét"""
+        logger.info(f"Starting scan with {self.__class__.__name__}")
+        
+    def _log_scan_end(self) -> None:
+        """Log kết thúc quét"""
+        logger.info(f"Scan completed with {self.__class__.__name__}")
         
     @abstractmethod
     def scan(self) -> Dict[str, Any]:
