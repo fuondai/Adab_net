@@ -4,19 +4,27 @@ import paramiko
 import smtplib
 import socket
 import threading
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 class AuthScanner:
-    def __init__(self, targets: List[str], credentials_file: str = None):
+    def __init__(
+        self, 
+        targets: List[str], 
+        credentials_file: Optional[str] = None,
+        timeout: int = 5
+    ):
         """
-        Initialize AuthScanner with targets and optional credentials file
+        Khởi tạo AuthScanner.
         
-        :param targets: List of target IPs or hostnames
-        :param credentials_file: Path to file with credentials (optional)
+        Args:
+            targets: Danh sách các target cần quét
+            credentials_file: File chứa credentials (optional)
+            timeout: Thời gian timeout cho mỗi kết nối
         """
         self.targets = targets
         self.credentials = self._load_credentials(credentials_file)
-        self.results = {}
+        self.timeout = timeout
+        self.results: Dict[str, Dict[str, List[Tuple[str, str]]]] = {}
         
     def _load_credentials(self, credentials_file: str) -> List[Tuple[str, str]]:
         """
@@ -48,7 +56,7 @@ class AuthScanner:
     def _check_ftp(self, host: str, username: str, password: str) -> bool:
         """Check FTP authentication"""
         try:
-            ftp = ftplib.FTP(timeout=5)
+            ftp = ftplib.FTP(timeout=self.timeout)
             ftp.connect(host)
             ftp.login(username, password)
             ftp.quit()
@@ -59,7 +67,7 @@ class AuthScanner:
     def _check_telnet(self, host: str, username: str, password: str) -> bool:
         """Check Telnet authentication"""
         try:
-            tn = telnetlib.Telnet(host, timeout=5)
+            tn = telnetlib.Telnet(host, timeout=self.timeout)
             tn.read_until(b"login: ")
             tn.write(username.encode('ascii') + b"\n")
             tn.read_until(b"Password: ")
@@ -75,7 +83,7 @@ class AuthScanner:
         try:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            client.connect(host, username=username, password=password, timeout=5)
+            client.connect(host, username=username, password=password, timeout=self.timeout)
             client.close()
             return True
         except Exception:
@@ -84,7 +92,7 @@ class AuthScanner:
     def _check_smtp(self, host: str, username: str, password: str) -> bool:
         """Check SMTP authentication"""
         try:
-            smtp = smtplib.SMTP(host, timeout=5)
+            smtp = smtplib.SMTP(host, timeout=self.timeout)
             smtp.login(username, password)
             smtp.quit()
             return True

@@ -3,6 +3,14 @@ import ssl
 import ipaddress
 import threading
 from scapy.all import conf, ICMP, IP, sr1, ARP, Ether, srp
+import logging
+from typing import List, Tuple
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Define a dictionary to map ports to service handling functions
 port_service_map = {
@@ -148,17 +156,30 @@ class BannerScanner:
 
 # --- Service Version Scanner ---
 class ServiceVersionScanner:
-    def __init__(self, target, ports, protocol="TCP"):
+    def __init__(self, target: str, ports: List[int], protocol: str = "TCP"):
         self.target = target
         self.ports = ports
         self.protocol = protocol.upper()
+        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
-    def scan(self):
-        results = []
-        for port in self.ports:
-            state, service, version = self.detect_service_version(port)
-            results.append((port, state, service, version))
-        return results
+    def scan(self) -> List[Tuple[int, str, str, str]]:
+        """
+        Thực hiện quét phiên bản dịch vụ.
+        
+        Returns:
+            List[Tuple[int, str, str, str]]: Danh sách kết quả quét
+            (port, state, service, version)
+        """
+        try:
+            results = []
+            for port in self.ports:
+                self.logger.debug(f"Scanning port {port}")
+                state, service, version = self.detect_service_version(port)
+                results.append((port, state, service, version))
+            return results
+        except Exception as e:
+            self.logger.error(f"Error during scan: {str(e)}")
+            raise
 
     def detect_service_version(self, port):
         state = "CLOSED"

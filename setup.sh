@@ -1,22 +1,35 @@
 #!/bin/bash
 
-# Check and install Python if not present
-if ! command -v python3 &> /dev/null
-then
-    echo "Python3 is not installed. Installing Python3..."
-    sudo apt update
-    sudo apt install -y python3 python3-pip
+# Kiểm tra quyền root
+if [ "$EUID" -ne 0 ]; then 
+    echo "Please run as root"
+    exit 1
 fi
 
-# Check and install pip if not present
-if ! command -v pip3 &> /dev/null
-then
-    echo "pip is not installed. Installing pip..."
-    sudo apt install -y python3-pip
+# Cài đặt các package system cần thiết
+apt-get update
+apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    libpcap-dev \
+    tcpdump
+
+# Tạo virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Cài đặt dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Tạo secret key nếu chưa tồn tại
+if [ ! -f "secret.key" ]; then
+    python3 server/create_secret_key.py
 fi
 
-# Install the required libraries
-echo "Installing Python libraries..."
-pip3 install socket scapy ipaddress threading argparse prettytable nmap colorama requests cryptography ftplib telnetlib paramiko smtplib shodan whois pyshark
+# Cấp quyền cho các file thực thi
+chmod +x main.py
+chmod +x server/server.py
 
-echo "Installation complete!"
+echo "Setup completed successfully!"
