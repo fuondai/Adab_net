@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from scapy.all import IP, TCP, UDP, ICMP, sr1, send, conf
 import time
 import os
+import ctypes
 
 class SpecializedScanner:
     def __init__(self, targets, scan_type='sn', ports=None):
@@ -20,9 +21,9 @@ class SpecializedScanner:
                 - 'sU' (UDP scan)
             ports (list, optional): List of ports to scan (for -sS, -sT, -sU)
         """
-        # Kiểm tra quyền root/admin
-        if os.geteuid() != 0:
-            raise PermissionError("This scanner requires root/admin privileges")
+        # Kiểm tra quyền admin trên Windows
+        if not ctypes.windll.shell32.IsUserAnAdmin():
+            raise PermissionError("This scanner requires administrator privileges. Please run as administrator.")
         
         self.targets = self._expand_targets(targets)
         self.scan_type = scan_type
