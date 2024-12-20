@@ -29,4 +29,5 @@ ENV/
 
 # Project specific
 *.key
-logs/ 
+logs/
+*.log

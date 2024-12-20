@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, List
-from src.scanner.factory import ScannerFactory
+from src.scanner import ScannerFactory
 from src.scanner.base import BaseScanner
 from src.exceptions import NetworkScannerError
 from src.logging_config import setup_logging

@@ -1,11 +1,23 @@
 class NetworkScannerError(Exception):
-    """Base exception class for NetworkScanner"""
+    """Base exception cho network scanner"""
     pass
 
 class ScannerError(NetworkScannerError):
-    """Raised when scanning operations fail"""
+    """Exception cho các lỗi scanner cụ thể"""
+    pass
+
+class EncryptionError(NetworkScannerError):
+    """Exception cho các lỗi liên quan đến mã hóa"""
+    pass
+
+class AuthenticationError(NetworkScannerError):
+    """Exception cho các lỗi xác thực"""
     pass
 
 class ConfigurationError(NetworkScannerError):
-    """Raised when there's a configuration error"""
+    """Exception cho các lỗi cấu hình"""
+    pass
+
+class ValidationError(NetworkScannerError):
+    """Exception cho các lỗi validation"""
     pass 

@@ -11,3 +11,4 @@ click>=8.0.0
 pyjwt>=2.0.0
 flasgger>=0.9.5
 flask-limiter>=2.0.0
+pillow>=8.0.0

@@ -3,16 +3,16 @@ import os
 from datetime import datetime
 
 def setup_logging():
-    """Configure logging for the application"""
-    log_dir = "logs"
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-        
-    log_file = os.path.join(
-        log_dir, 
-        f"scanner_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-    )
+    """Thiết lập logging cho ứng dụng"""
     
+    # Tạo thư mục logs nếu chưa tồn tại
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+        
+    # Định dạng tên file log theo ngày
+    log_file = f"logs/scanner_{datetime.now().strftime('%Y%m%d')}.log"
+    
+    # Cấu hình logging
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

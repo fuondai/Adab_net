@@ -1,7 +1,7 @@
 # Adab Network Security Tools 🛡️
 
 <p align="center">
-  <img src="docs/images/logo.png" alt="Adab Network Security Tools Logo" width="200"/>
+  <img src="scripts/docs/images/logo.png" alt="Adab Network Security Tools Logo" width="200"/>
   <br>
   <em>A comprehensive network security toolkit for penetration testing and security analysis</em>
 </p>
@@ -161,20 +161,20 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/thienan">
-        <img src="https://github.com/thienan.png" width="100px;" alt="Thien An"/><br />
+      <a href="https://github.com/ThienAnUIT2022">
+        <img src="https://github.com/ThienAnUIT2022.png" width="100px;" alt="Thien An"/><br />
         <sub><b>Thien An</b></sub>
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/congdanh">
-        <img src="https://github.com/congdanh.png" width="100px;" alt="Cong Danh"/><br />
+      <a href="https://github.com/poteygray">
+        <img src="https://github.com/poteygray.png" width="100px;" alt="Cong Danh"/><br />
         <sub><b>Cong Danh</b></sub>
       </a>
     </td>
     <td align="center">
-      <a href="https://github.com/huubinh">
-        <img src="https://github.com/huubinh.png" width="100px;" alt="Huu Binh"/><br />
+      <a href="https://github.com/binhtaphocattt">
+        <img src="https://github.com/binhtaphocattt.png" width="100px;" alt="Huu Binh"/><br />
         <sub><b>Huu Binh</b></sub>
       </a>
     </td>
@@ -183,7 +183,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. [Coming Soon ⚠️]
 
 ## 🙏 Acknowledgments
 
@@ -193,16 +193,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- Create an [Issue](https://github.com/fuondai/Adab_net/issues)
+- Create an [Issue](https://github.com/fuondai/Adab_net/issues) 
 - Email: fuondai1314@gmail.com
-- Join our [Discord community](https://discord.gg/adabnet)
+- Join our [Discord community](https://discord.gg/adabnet) [Coming Soon ⚠️]
 
 ## 🔗 Links
 
-- [Project Homepage](https://adabnet.io)
-- [Documentation](https://docs.adabnet.io)
-- [Bug Tracker](https://github.com/fuondai/Adab_net/issues)
-- [Release Notes](CHANGELOG.md)
+- [Project Homepage](https://adabnet.io) [Coming Soon ⚠️]
+- [Documentation](https://docs.adabnet.io) [Coming Soon ⚠️]
+- [Bug Tracker](https://github.com/fuondai/Adab_net/issues) [Coming Soon ⚠️]
+- [Release Notes](CHANGELOG.md) [Coming Soon ⚠️]
 
 ---
 
