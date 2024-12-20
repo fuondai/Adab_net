@@ -27,6 +27,7 @@ setup(
         ],
         "dev": [
             "pytest>=6.2.5",
+            "pytest-cov>=2.12.0",
             "black>=21.7b0",
             "mypy>=0.910",
             "pylint>=2.8.0",

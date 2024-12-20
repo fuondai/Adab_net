@@ -1,0 +1,27 @@
+[tool.black]
+line-length = 88
+target-version = ['py37']
+include = '\.pyi?$'
+
+[tool.pylint.messages_control]
+disable = [
+    "C0111",  # missing-docstring
+    "C0103",  # invalid-name
+    "C0330",  # bad-continuation
+    "C0326",  # bad-whitespace
+]
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.mypy]
+python_version = "3.7"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --cov=src --cov-report=xml" 

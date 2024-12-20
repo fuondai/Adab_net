@@ -5,9 +5,18 @@ requests>=2.26.0
 colorama>=0.4.4
 paramiko>=2.7.2
 python-whois>=0.7.3
+flask>=2.0.0
+sqlalchemy>=1.4.0
+click>=8.0.0
+pyjwt>=2.0.0
+flasgger>=0.9.5
+flask-limiter>=2.0.0
 
 # Development dependencies
 pytest>=6.2.5
+pytest-cov>=2.12.0
 black>=21.7b0
 mypy>=0.910
 pylint>=2.8.0
+build>=0.7.0
+twine>=3.4.2
