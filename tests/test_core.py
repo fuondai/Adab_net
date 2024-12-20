@@ -1,5 +1,7 @@
 import unittest
-from scanner.core import get_ip_range, resolve_hostname, is_reachable
+from scanner.core import get_ip_range, resolve_hostname, is_reachable, scan_parallel
+from scanner.base import BaseScanner
+import pytest
 
 class TestCoreFunctions(unittest.TestCase):
     def test_get_ip_range(self):
@@ -14,3 +16,14 @@ class TestCoreFunctions(unittest.TestCase):
     def test_is_reachable(self):
         self.assertTrue(is_reachable("127.0.0.1"))
         self.assertFalse(is_reachable("10.255.255.1"))  # Không tồn tại
+
+    def test_scan_parallel(self):
+        targets = ["example.com", "google.com"]
+        results = scan_parallel(targets)
+        
+        self.assertEqual(len(results), 2)
+        self.assertTrue(all(isinstance(v, dict) for v in results.values()))
+
+    def test_invalid_targets(self):
+        with self.assertRaises(ValueError):
+            scanner = BaseScanner([])
