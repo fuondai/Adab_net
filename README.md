@@ -102,48 +102,7 @@ export SERVER_PORT=5000
 # Show help
 python main.py -h
 
-# Basic port scan
-python main.py -p 80,443 example.com
-
-# DNS enumeration
-python main.py --dns example.com
-
-# Vulnerability scan (requires API key)
-python main.py --vuln-scan example.com
-```
-
-## 📚 Documentation
-
-Detailed documentation is available in the [docs](docs/) directory:
-
-- [Installation Guide](docs/installation.md)
-- [User Manual](docs/user-manual.md)
-- [API Reference](docs/api-reference.md)
-- [Contributing Guidelines](docs/contributing.md)
-
-## 🛠️ Development
-
-### Setting up development environment
-
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Run linting
-pylint src/
-```
-
-### Docker Support
-
-```bash
-# Build image
-docker build -t adabnet .
-
-# Run container
-docker run -p 5000:5000 adabnet
+# Read all command examples.txt
 ```
 
 ## 🤝 Contributing
@@ -195,14 +154,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Create an [Issue](https://github.com/fuondai/Adab_net/issues) 
 - Email: fuondai1314@gmail.com
-- Join our [Discord community](https://discord.gg/adabnet) [Coming Soon ⚠️]
-
-## 🔗 Links
-
-- [Project Homepage](https://adabnet.io) [Coming Soon ⚠️]
-- [Documentation](https://docs.adabnet.io) [Coming Soon ⚠️]
-- [Bug Tracker](https://github.com/fuondai/Adab_net/issues) [Coming Soon ⚠️]
-- [Release Notes](CHANGELOG.md) [Coming Soon ⚠️]
 
 ---
 
