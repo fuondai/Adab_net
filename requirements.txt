@@ -8,4 +8,7 @@ cryptography
 paramiko
 shodan
 whois
+python-whois
 pyshark
+flask
+pytest
