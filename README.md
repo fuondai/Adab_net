@@ -68,7 +68,7 @@ Adab Network Security Tools is a powerful Python-based security toolkit that pro
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/fuondai/Adab_net.git
+git clone --branch development --single-branch https://github.com/fuondai/Adab_net.git
 cd Adab_net
 ```
 
