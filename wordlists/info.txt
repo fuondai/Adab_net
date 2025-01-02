@@ -1,0 +1,7 @@
+admin admin
+msfadmin msfadmin
+test test
+admin 123
+test test
+user user123
+admin	Admin123!
