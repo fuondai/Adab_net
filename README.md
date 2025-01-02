@@ -17,7 +17,8 @@ To use these tools, you need to install the required dependencies. You can insta
 ```bash
 pip install -r requirements.txt
 ```
-```bash (FIX)
+```bash
+Run this command to fix missing sudo pyshark module:
 sudo pip install pyshark --break-system-packages
 ```
 Using Adabnet
