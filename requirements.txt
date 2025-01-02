@@ -11,3 +11,5 @@ mysql
 psycopg2
 redis
 mysql-connector-python
+flask
+pytest
