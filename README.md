@@ -1,23 +1,5 @@
 # Adab Network Security Tools 🛡️
 
-<p align="center">
-  <img src="scripts/docs/images/logo.png" alt="Adab Network Security Tools Logo" width="200"/>
-  <br>
-  <em>A comprehensive network security toolkit for penetration testing and security analysis</em>
-</p>
-
-<p align="center">
-  <a href="https://github.com/fuondai/Adab_net/actions">
-    <img src="https://github.com/fuondai/Adab_net/workflows/CI/CD/badge.svg" alt="Build Status">
-  </a>
-  <a href="https://github.com/fuondai/Adab_net/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/fuondai/Adab_net" alt="License">
-  </a>
-  <a href="https://github.com/fuondai/Adab_net/releases">
-    <img src="https://img.shields.io/github/v/release/fuondai/Adab_net" alt="Latest Release">
-  </a>
-</p>
-
 ## 📖 Overview
 
 Adab Network Security Tools is a powerful Python-based security toolkit that provides a wide range of network analysis and security assessment capabilities. From basic network reconnaissance to advanced vulnerability scanning, this toolkit is designed for security professionals, network administrators, and penetration testers.
