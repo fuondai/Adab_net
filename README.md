@@ -66,8 +66,12 @@ source venv/bin/activate  # Linux/Mac
 # Install required packages
 pip install -r requirements.txt
 
-# Fix missing Lib
-sudo apt update
+# Fix missing Lib (Optional)
+sudo apt update -y && sudo apt upgrade -y
+sudo apt install libpq-dev -y
+sudo apt install libmysqlclient-dev -y
+sudo apt install libmariadb-dev -y
+sudo apt install build-essential -y
 sudo apt install python3-dev default-libmysqlclient-dev build-essential
 
 ```
