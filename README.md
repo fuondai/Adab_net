@@ -65,6 +65,11 @@ source venv/bin/activate  # Linux/Mac
 
 # Install required packages
 pip install -r requirements.txt
+
+# Fix missing Lib
+sudo apt update
+sudo apt install python3-dev default-libmysqlclient-dev build-essential
+
 ```
 
 3. Set up configuration:
