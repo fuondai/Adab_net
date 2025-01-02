@@ -1,17 +1,11 @@
-socket
 scapy
 ipaddress
-threading
 argparse
 prettyTable
-nmap
 colorama
 requests
 cryptography
-ftplib
-telnetlib
 paramiko
-smtplib
 shodan
 whois
 pyshark
